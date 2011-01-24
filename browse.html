@@ -1,0 +1,608 @@
+<html>
+ <head>
+  <meta http-equiv=" Content-Type" content="text/html;charset=UTF-8">
+  <link type="text/css" rel="stylesheet" href="css/basic.css" />
+  <script type="text/javascript" src='lib/jquery.js'></script>
+
+
+<!--<meta name="viewport" content="width=1000" />-->
+
+  <title>Browse Video Archives</title>
+
+ </head>
+
+
+<body onload="insert()">
+<script type="text/javascript">
+
+var search_url = "http://dev.notu.be/2011/01/api/search"
+var suggest_url = "http://dev.notu.be/2011/01/api/suggest";
+var start_url="http://dev.notu.be/2011/01/api/random?fmt=json";
+
+var checked = false;
+var user_id="unknown";
+
+function insert2(script) {
+   var headID = document.getElementsByTagName("head")[0];
+   var newScript = document.createElement('script');
+   newScript.type = 'text/javascript';
+   newScript.src = script;
+   headID.appendChild(newScript);
+}
+
+
+function do_search(txt){
+//alert(search_url+"?q="+txt+"&fmt=json ....");
+   insert2(search_url+"?q="+txt+"&fmt=json&user_id="+user_id);
+}
+
+
+function do_cat_search(txt){
+///alert(search_url+"?cat="+txt+"&fmt=json ,,,,");
+   insert2(search_url+"?cat="+txt+"&fmt=json&user_id="+user_id);
+}
+
+
+function formatItem(row) {
+   return "<strong>" + row[0] + "</strong>";
+}
+
+function formatResult(row) {
+//alert(row[0]);
+    return row[0];
+//   return row[0].replace(/(<.+?>)/gi, '');
+}
+
+
+
+function search_results(ob){
+//alert(ob.length)
+  var html = "<ul>";
+  if(ob.length==0){
+    html="<li>Sorry, nothing found</li>";
+    suggest1(html)
+    r.innerHTML=html;
+  }else{
+     var count = 0;
+     var num = (ob.length +1) / 2;
+     for (var i in ob){
+        count = count +1;
+        var cct = ob[i]["core_title"];
+        var sst = ob[i]["series_title"];
+
+        if(sst){
+          sst = capitalise(sst);
+        }                  
+
+        if(cct){
+          cct = capitalise(cct);
+        }
+
+        var fulltitle ="";
+        if(cct && cct!="" && cct!=" "){
+           if(sst && sst!=""){
+             fulltitle = sst +": "+cct;           
+           }else{
+             fulltitle = cct;           
+           }
+        }else{
+           if(sst && sst!=""){
+             fulltitle = sst;           
+           }
+        }
+
+
+
+        html = html+"<li><b><a href=\"#\" onclick=\"javascript:refresh_suggestions('"+ob[i]["crid"]+"')\">"+fulltitle+"</a></b><p>"+ob[i]["text_date"]+" on "+ob[i]["channel"]+"</p></li>\n"
+
+     }
+     html = html+"</ul>";
+   suggest1(html);
+  }
+}
+
+
+
+///// strophe functions
+
+function results(result){
+  var pid = result["pid"];
+  pidurl(pid);
+
+  playbuttonfar("<a href=\"#\" onclick=\"javascript:sendCommand('PLPZ','')\">play far</a><br /><br />");
+
+}
+
+
+function capitalise(txt){
+
+var arr = txt.split(/[.|,| |\(|\)|\[|\]]/);
+var arr2 = [];
+//split
+  for(x in arr){
+    var str = arr[x];
+    var letter = str.substr(0,1);
+    arr2.push(letter.toUpperCase() + str.substr(1).toLowerCase());
+  }
+
+ return arr2.join(" ");
+}
+
+//process the script results
+function recommendations(result){
+
+          var pn = result["programme_number"];
+          var ct = result["core_title"];
+          var st = result["series_title"];
+          var img = result["image"];
+          var suggestions = result["suggestions"];
+          var crid = result["crid"];
+          var pid = result["pid"];
+          var ddtt = result["date_time"];
+          var text_date = result["text_date"];
+          var channel = result["channel"];
+          var description = result["description"];
+          var catz = result["categories"];
+
+          if(catz){
+             var cats ="<b>Categories:</b> ";
+             for(var i in catz){
+                   var tn = catz[i]["term_name"];
+                   tn = tn.toLowerCase();
+                   var tnum = catz[i]["term"];
+                   cats = cats+"<a href=\"#\" onclick=\"javascript:do_cat_search('"+tnum+"');return false;\">"+tn+"</a> ";
+             }
+             print_cats(cats);
+          }
+
+          var playlist = " <a href=\"#\" onclick=\"javascript:playlist_add('"+crid+"');return false;\">Add to playlist</a> ";
+          if(!crid){
+            playlist="";
+          }
+
+          if(pid){
+            if(description){
+               telly(description+" <p><a href='http://www.bbc.co.uk/programmes/"+pid+"' target='_blank'>BBC website</a></p>"+playlist);
+            }else{
+               telly(playlist);
+            }
+
+            if(img){
+               image("<img src=\""+img+"\" width=\"512\"/>")
+            }
+          }else{
+            image("<img src=\"images/bbc_logo.jpg\" width=\"512\"/>");
+
+            if(!pn){
+ //             var instr="<p>Thank you for participating in our research.</p><p>Please spend as much or as little time as you like over the next 7 days to browse through this video collection from Redux and add programmes that you'd like to watch to your playlist. You can use this app as many times as you want during the course of the week.</p><p>When you've finished creating your playlist, you will be given a URL for it. You can use this URL to access the playlist until the end of the NoTube project (March 2012).</p><p>Please email us if you come across any bugs or would like to ask us any questions.</p>";
+//              telly(instr);
+            }else{
+
+              if(description){
+                telly(description+" "+playlist);
+              }else{
+                telly("No description found "+playlist);
+              }
+            }
+          }
+
+
+
+          var ti = "";
+          if(st){
+            st = capitalise(st);
+          }                  
+
+          if(ct){
+            ct = capitalise(ct);
+          }
+          if(st && st!=" " && st!=""){
+             ti = st;
+             if(ct && ct!=" " && ct!=""){
+               ti = st+" : "+ct;
+             }else{
+               ti = st;
+             }
+          }else{
+             if(ct && ct!=" " && ct!=""){
+               ti = ct;
+             }
+          }
+
+          title(ti);
+          var s1 ="";
+          var s2 ="";
+          var s = "<ul>";
+
+          if (suggestions.length>0){
+
+            var count = 0;
+            var num = suggestions.length/2;
+            for (r in suggestions){
+                count = count + 1;
+                var categories = suggestions[r]["categories"];
+                var cats = "";
+                var cc = 0;
+                for (r2 in categories){
+                   var tn = categories[r2]["term_name"];
+                   var wd = categories[r2]["word"];
+                   var tnum = categories[r2]["term"];
+                   var freq = categories[r2]["term_frequency"];
+                   tn = tn.toLowerCase();
+                   cats = cats+"<a href=\"#\" onclick=\"javascript:do_cat_search('"+tnum+"');return false;\">"+tn+"</a>";
+                   cc = cc+1;
+
+                   if (cc<categories.length){
+                       cats = cats+", ";
+                   }
+                }
+                var st1 = suggestions[r]["series_title"];
+                var ct1 = suggestions[r]["core_title"];
+                var crid1 = suggestions[r]["crid"];
+                var desc = suggestions[r]["description"];
+                var ppid = suggestions[r]["pid"];
+                var img = suggestions[r]["image"];
+                var pn1 = suggestions[r]["programme_number"];
+                var ddtt = suggestions[r]["date_time"];
+                var text_date = suggestions[r]["text_date"];
+                var pid = suggestions[r]["pid"];
+
+                var playlist = " <a href=\"#\" onclick=\"javascript:playlist_add('"+crid1+"');return false;\">Add to playlist</a> ";
+
+                if(st1){
+                  st1 = capitalise(st1);
+                }
+                if(ct1){
+                  ct1 = capitalise(ct1);
+                }
+
+
+                s = s+"<li>";
+
+                if(img){
+                   s = s+ "<div style=\"float:left;padding:10px\"><img src='"+img+"' width='200'/></div>";
+                }
+
+
+                if (st1 && st1!="" && st1!=" "){
+                  s = s+"<div style=\"padding:10px\"><b><a href=\"#\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\">"+st1+": "+ct1+"</a></b>"
+                }else{
+                  s = s+"<div style=\"padding:10px\"><b><a href=\"#\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\">"+ct1+"</a></b>"
+                }
+                if(desc){
+                   s = s+"<p>"+desc;
+                   if(text_date){
+                     s = s+" From "+text_date;
+                   }
+                   if(pid){
+                     s = s+" <br /><a href='http://www.bbc.co.uk/programmes/"+pid+"' target='_blank'>BBC Website</a>";
+                   }
+                   s = s+"</p>\n"+playlist;
+                }else{//horrible, sorry!
+                  s = s+"<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>\n"+playlist;
+                }
+                if(cats && cats!=""){
+                  s = s+ " Links: "+cats+"\n";
+                }
+                s = s+ "</div></li>\n";
+            }
+          
+            s = s + "</ul>";
+            suggest1(s);
+          }
+}
+
+function programme(thing){
+ var desc = thing["programme"]["medium_synopsis"];
+ telly(desc);
+
+}
+
+var script = start_url;
+
+//inject start script
+
+function insert() {
+   checkCookies();
+   if(!checked){
+     alert("hi! your uuique id is "+user_id+". This is an experiment to... We will take good care of your data...");
+   }else{
+//     alert("ok! "+user_id);
+   }
+   show_playlist();
+   var headID = document.getElementsByTagName("head")[0];
+   var newScript = document.createElement('script');
+   newScript.type = 'text/javascript';
+   newScript.src = script+"&user_id="+user_id;
+   headID.appendChild(newScript);
+}
+
+
+function show_playlist(){
+  var i = document.getElementById("playlist");
+  i.innerHTML="<a href=\"#\" onclick=\"javascript:playlist_get('"+user_id+"');return false;\">Show Playlist</a>"
+}
+
+function insert_with_src(sc) {
+   var headID = document.getElementsByTagName("head")[0];
+   var newScript = document.createElement('script');
+   newScript.type = 'text/javascript';
+   newScript.src = sc;
+   headID.appendChild(newScript);
+}
+
+
+//1. just does the suggest thing
+//2. that looks up the infax / crid on progs and finds the image
+//3. finds descriptions for all of them
+
+function refresh_suggestions(crid){
+
+    var y =suggest_url+"?crid="+crid+"&fmt=json&user_id="+user_id;
+    //alert(y);
+    insert_with_src(y);
+}
+
+function out(msg) {
+  var out = document.getElementById('out');
+  out.innerHTML = msg;
+}
+
+function telly(msg) {
+  var out = document.getElementById('telly');
+  out.innerHTML = msg;
+}
+function title(msg) {
+  var out = document.getElementById('title');
+  out.innerHTML = msg+" <small>("+user_id+")</small>";
+}
+function image(msg) {
+  var out = document.getElementById('image');
+  out.innerHTML = msg;
+}
+
+function pidurl(pid) {
+  var out = document.getElementById('pidurl');
+  out.innerHTML =" (<a href=\"http://www.bbc.co.uk/programmes/"+pid+"\">/Programmes page</a>)<br />";
+}
+function playbuttonnear(text) {
+  var out = document.getElementById('playbuttonnear');
+  out.innerHTML = text;
+}
+function playbuttonfar(text) {
+  var out = document.getElementById('playbuttonfar');
+  out.innerHTML = text;
+}
+
+function suggest1(text) {
+  var out = document.getElementById("suggestions1");
+  out.innerHTML = text;
+}
+function print_cats(text) {
+  var out = document.getElementById("cats");
+  out.innerHTML = text;
+}
+
+
+//cookies stuff
+//onload check for a specific cookie
+//if not there. generate a random number, create a cookie; display T&Cs
+//else use the one in the cookie
+
+//createCookie('ppkcookie','testcookie',7)
+//var x = readCookie('ppkcookie1')
+
+function checkCookies(){
+  var cookie = readCookie('notube_eval1');
+  if(cookie){
+     checked = true;
+     user_id=cookie;
+  }else{
+     checked = false;
+     var r=Math.floor(Math.random()*10000000);
+     user_id = 'nt_user_'+r
+     createCookie('notube_eval1',user_id,7)
+  }
+}
+
+function createCookie(name,value,days) {
+	if (days) {
+		var date = new Date();
+		date.setTime(date.getTime()+(days*24*60*60*1000));
+		var expires = "; expires="+date.toGMTString();
+	}
+	else var expires = "";
+	document.cookie = name+"="+value+expires+"; path=/";
+}
+
+function readCookie(name) {
+	var nameEQ = name + "=";
+	var ca = document.cookie.split(';');
+	for(var i=0;i < ca.length;i++) {
+		var c = ca[i];
+		while (c.charAt(0)==' ') c = c.substring(1,c.length);
+		if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+	}
+	return null;
+}
+
+function eraseCookie(name) {
+	createCookie(name,"",-1);
+}
+
+//playlist stuff
+
+function playlist_add(crid){
+   var u = "http://dev.notu.be/2011/01/api/playlist?action=add&user_id="+user_id+"&crid="+crid+"&fmt=json";
+
+   var headID = document.getElementsByTagName("head")[0];
+   var newScript = document.createElement('script');
+   newScript.type = 'text/javascript';
+   newScript.src = u;
+   headID.appendChild(newScript);
+
+}
+
+function playlist_delete(crid){
+   var u = "http://dev.notu.be/2011/01/api/playlist?action=delete&user_id="+user_id+"&crid="+crid+"&fmt=json";
+
+   var headID = document.getElementsByTagName("head")[0];
+   var newScript = document.createElement('script');
+   newScript.type = 'text/javascript';
+   newScript.src = u;
+   headID.appendChild(newScript);
+
+}
+
+function playlist_get(crid){
+   var u = "http://dev.notu.be/2011/01/api/playlist?action=get&user_id="+user_id+"&crid="+crid+"&fmt=json";
+
+   var headID = document.getElementsByTagName("head")[0];
+   var newScript = document.createElement('script');
+   newScript.type = 'text/javascript';
+   newScript.src = u;
+   headID.appendChild(newScript);
+
+}
+
+//show playlist
+
+//process the script results
+function playlist(result){
+
+          var suggestions = result["suggestions"];
+          var s="";
+          var ss="";
+
+          if (suggestions.length>0){
+
+            var count = 0;
+            var num = suggestions.length/2;
+            for (r in suggestions){
+                count = count + 1;
+                var categories = suggestions[r]["categories"];
+                var cats = "";
+                var cc = 0;
+                for (r2 in categories){
+                   var tn = categories[r2]["term_name"];
+                   var wd = categories[r2]["word"];
+                   var tnum = categories[r2]["term"];
+                   var freq = categories[r2]["term_frequency"];
+                   tn = tn.toLowerCase();
+                   cats = cats+"<a href=\"#\" onclick=\"javascript:do_cat_search('"+tnum+"');return false;\">"+tn+"</a>";
+                   cc = cc+1;
+
+                   if (cc<categories.length){
+                       cats = cats+", ";
+                   }
+                }
+                var st1 = suggestions[r]["series_title"];
+                var ct1 = suggestions[r]["core_title"];
+                var crid1 = suggestions[r]["crid"];
+                var desc = suggestions[r]["description"];
+                var ppid = suggestions[r]["pid"];
+                var img = suggestions[r]["image"];
+                var pn1 = suggestions[r]["programme_number"];
+                var ddtt = suggestions[r]["date_time"];
+                var text_date = suggestions[r]["text_date"];
+                var pid = suggestions[r]["pid"];
+
+                var playlist = " <a href=\"#\" onclick=\"javascript:playlist_add('"+crid1+"');return false;\">Add to playlist</a> ";
+
+                if(st1){
+                  st1 = capitalise(st1);
+                }
+                if(ct1){
+                  ct1 = capitalise(ct1);
+                }
+
+
+                s = s+"<li>";
+
+                if(img){
+                   s = s+ "<div style=\"float:left;padding:10px\"><img src='"+img+"' width='200'/></div>";
+                }
+
+                ss = ss+st1+"\n";
+
+                if (st1 && st1!="" && st1!=" "){
+                  s = s+"<div style=\"padding:10px\"><b><a href=\"#\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\">"+st1+": "+ct1+"</a></b>"
+                }else{
+                  s = s+"<div style=\"padding:10px\"><b><a href=\"#\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\">"+ct1+"</a></b>"
+                }
+                if(desc){
+                   s = s+"<p>"+desc;
+                   if(text_date){
+                     s = s+" From "+text_date;
+                   }
+                   if(pid){
+                     s = s+" <br /><a href='http://www.bbc.co.uk/programmes/"+pid+"' target='_blank'>BBC Website</a>";
+                   }
+                   s = s+"</p>\n"+playlist;
+                }else{//horrible, sorry!
+                  s = s+"<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>\n"+playlist;
+                }
+                if(cats && cats!=""){
+                  s = s+ " Links: "+cats+"\n";
+                }
+                s = s+ "</div></li>\n";
+            }
+          
+            s = s + "</ul>";
+//            suggest1(s);
+            alert(ss);
+          }
+}
+
+
+</script>
+
+<body>
+  <div id="header">
+    <span id="title">Browse Archive Video</span>
+    <span class="form" id="playlist"></form>
+  </div>
+  <div id="wrapper">
+	<div id="container">
+		<div id="side-a">
+                  <span id="image">
+                     <img src="images/bbc_logo.jpg" width="512"/>
+                  </span>
+
+
+                   <div class="centre">
+
+                   </div>
+<p>
+<span id="telly">
+
+<p>Thank you for participating in our research.</p><p>Please spend as much or as little time as you like over 
+the next 7 days to browse through this video collection from Redux and add programmes that you'd like to watch 
+to your playlist. You can use this app as many times as you want during the course of the week.</p><p>When 
+you've finished creating your playlist, you will be given a URL for it. You can use this URL to access the 
+playlist until the end of the NoTube project (March 2012).</p><p>Please email us if you come across any bugs or 
+would like to ask us any questions.</p>
+
+</span>
+<span id="pidurl"></span>
+<br />
+<span id="cats"></span>
+</p>
+		</div>
+		
+
+ 
+
+                <span id="suggestions1"></span>
+	</div>
+
+  </div>
+</div>
+<br />
+<div id="footer">
+<small><span id="out"></span></small>
+</div>
+</body>
+
+</html>
+
