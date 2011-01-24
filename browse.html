@@ -43,30 +43,22 @@ function do_cat_search(txt){
 }
 
 
-function formatItem(row) {
-   return "<strong>" + row[0] + "</strong>";
-}
-
-function formatResult(row) {
-//alert(row[0]);
-    return row[0];
-//   return row[0].replace(/(<.+?>)/gi, '');
-}
-
-
 
 function search_results(ob){
 //alert(ob.length)
-  var html = "<ul>";
-  if(ob.length==0){
-    html="<li>Sorry, nothing found</li>";
+
+  var html = "<h4>Programmes about ";
+  if(ob.length==1){
+    var t = ob[0]["term"];
+    var tn = ob[0]["term_name"];
+    html=tn+"</h4>\n<ul><li>Sorry, nothing found</li>\n";
     suggest1(html)
     r.innerHTML=html;
   }else{
-     var count = 0;
-     var num = (ob.length +1) / 2;
-     for (var i in ob){
-        count = count +1;
+     var t = ob[0]["term"];
+     var tn = ob[0]["term_name"];
+     html=html+""+tn+"</h4>\n<ul>\n";
+     for (var i=1; i<ob.length; i++){
         var cct = ob[i]["core_title"];
         var sst = ob[i]["series_title"];
 
@@ -91,26 +83,12 @@ function search_results(ob){
            }
         }
 
-
-
         html = html+"<li><b><a href=\"#\" onclick=\"javascript:refresh_suggestions('"+ob[i]["crid"]+"')\">"+fulltitle+"</a></b><p>"+ob[i]["text_date"]+" on "+ob[i]["channel"]+"</p></li>\n"
 
      }
      html = html+"</ul>";
    suggest1(html);
   }
-}
-
-
-
-///// strophe functions
-
-function results(result){
-  var pid = result["pid"];
-  pidurl(pid);
-
-  playbuttonfar("<a href=\"#\" onclick=\"javascript:sendCommand('PLPZ','')\">play far</a><br /><br />");
-
 }
 
 
@@ -145,7 +123,7 @@ function recommendations(result){
           var catz = result["categories"];
 
           if(catz){
-             var cats ="<b>Categories:</b> ";
+             var cats ="<b>More programmes about:</b> ";
              for(var i in catz){
                    var tn = catz[i]["term_name"];
                    tn = tn.toLowerCase();
@@ -155,16 +133,9 @@ function recommendations(result){
              print_cats(cats);
           }
 
-          var playlist = " <a href=\"#\" onclick=\"javascript:playlist_add('"+crid+"');return false;\">Add to playlist</a> ";
-          if(!crid){
-            playlist="";
-          }
-
           if(pid){
             if(description){
-               telly(description+" <p><a href='http://www.bbc.co.uk/programmes/"+pid+"' target='_blank'>BBC website</a></p>"+playlist);
-            }else{
-               telly(playlist);
+               telly(description+" <p><a href='http://www.bbc.co.uk/programmes/"+pid+"' target='_blank'>More about this programme</a></p>");
             }
 
             if(img){
@@ -174,14 +145,12 @@ function recommendations(result){
             image("<img src=\"images/bbc_logo.jpg\" width=\"512\"/>");
 
             if(!pn){
- //             var instr="<p>Thank you for participating in our research.</p><p>Please spend as much or as little time as you like over the next 7 days to browse through this video collection from Redux and add programmes that you'd like to watch to your playlist. You can use this app as many times as you want during the course of the week.</p><p>When you've finished creating your playlist, you will be given a URL for it. You can use this URL to access the playlist until the end of the NoTube project (March 2012).</p><p>Please email us if you come across any bugs or would like to ask us any questions.</p>";
-//              telly(instr);
             }else{
 
               if(description){
-                telly(description+" "+playlist);
+                telly(description);
               }else{
-                telly("No description found "+playlist);
+                telly("No description found");
               }
             }
           }
@@ -207,6 +176,11 @@ function recommendations(result){
              if(ct && ct!=" " && ct!=""){
                ti = ct;
              }
+          }
+
+          var playlist = " <big><a href=\"#\" title=\"Add to playlist\" onclick=\"javascript:playlist_add('"+crid+"');return false;\">[+]</a></big> ";
+          if(crid){
+            ti = playlist+""+ti;
           }
 
           title(ti);
@@ -247,7 +221,6 @@ function recommendations(result){
                 var text_date = suggestions[r]["text_date"];
                 var pid = suggestions[r]["pid"];
 
-                var playlist = " <a href=\"#\" onclick=\"javascript:playlist_add('"+crid1+"');return false;\">Add to playlist</a> ";
 
                 if(st1){
                   st1 = capitalise(st1);
@@ -260,7 +233,7 @@ function recommendations(result){
                 s = s+"<li>";
 
                 if(img){
-                   s = s+ "<div style=\"float:left;padding:10px\"><img src='"+img+"' width='200'/></div>";
+                   s = s+ "<div style=\"float:left;padding:10px\"><a href=\"#\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\"><img src='"+img+"' width='200' border='0'/></a></div>";
                 }
 
 
@@ -269,20 +242,26 @@ function recommendations(result){
                 }else{
                   s = s+"<div style=\"padding:10px\"><b><a href=\"#\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\">"+ct1+"</a></b>"
                 }
+
+                var playlist = " <big><a href=\"#\" title=\"Add to playlist\" onclick=\"javascript:playlist_add('"+crid1+"');return false;\">[+]</a></big> ";
+                if(crid1){
+                  s = s+""+playlist;
+                }
+
+                if(text_date){
+                   s = s+"<br /><small>"+text_date+"</small>";
+                }
                 if(desc){
                    s = s+"<p>"+desc;
-                   if(text_date){
-                     s = s+" From "+text_date;
-                   }
                    if(pid){
-                     s = s+" <br /><a href='http://www.bbc.co.uk/programmes/"+pid+"' target='_blank'>BBC Website</a>";
+                     s = s+" <a href='http://www.bbc.co.uk/programmes/"+pid+"' target='_blank'>More about this programme</a>";
                    }
-                   s = s+"</p>\n"+playlist;
+                   s = s+"</p>\n"
                 }else{//horrible, sorry!
-                  s = s+"<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>\n"+playlist;
+                  s = s+"<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>\n";
                 }
                 if(cats && cats!=""){
-                  s = s+ " Links: "+cats+"\n";
+                  s = s+ " Related by: "+cats+"\n";
                 }
                 s = s+ "</div></li>\n";
             }
@@ -388,9 +367,6 @@ function print_cats(text) {
 //onload check for a specific cookie
 //if not there. generate a random number, create a cookie; display T&Cs
 //else use the one in the cookie
-
-//createCookie('ppkcookie','testcookie',7)
-//var x = readCookie('ppkcookie1')
 
 function checkCookies(){
   var cookie = readCookie('notube_eval1');
@@ -530,20 +506,24 @@ function playlist(result){
                 }else{
                   s = s+"<div style=\"padding:10px\"><b><a href=\"#\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\">"+ct1+"</a></b>"
                 }
+
+                if(playlist){
+                 s = s+""+playlist;
+                }
                 if(desc){
                    s = s+"<p>"+desc;
                    if(text_date){
                      s = s+" From "+text_date;
                    }
                    if(pid){
-                     s = s+" <br /><a href='http://www.bbc.co.uk/programmes/"+pid+"' target='_blank'>BBC Website</a>";
+                     s = s+" <a href='http://www.bbc.co.uk/programmes/"+pid+"' target='_blank'>More about this programme</a>";
                    }
-                   s = s+"</p>\n"+playlist;
+                   s = s+"</p>\n";
                 }else{//horrible, sorry!
                   s = s+"<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>\n"+playlist;
                 }
                 if(cats && cats!=""){
-                  s = s+ " Links: "+cats+"\n";
+                  s = s+ " Related by: "+cats+"\n";
                 }
                 s = s+ "</div></li>\n";
             }
@@ -577,8 +557,8 @@ function playlist(result){
 <span id="telly">
 
 <p>Thank you for participating in our research.</p><p>Please spend as much or as little time as you like over 
-the next 7 days to browse through this video collection from Redux and add programmes that you'd like to watch 
-to your playlist. You can use this app as many times as you want during the course of the week.</p><p>When 
+the next 7 days to browse through this video collection and add programmes that you'd like to watch 
+to your playlist by clicking on <b>"[+]"</b> next to a programme. You can use this app as many times as you want during the course of the week.</p><p>When 
 you've finished creating your playlist, you will be given a URL for it. You can use this URL to access the 
 playlist until the end of the NoTube project (March 2012).</p><p>Please email us if you come across any bugs or 
 would like to ask us any questions.</p>
