@@ -15,6 +15,25 @@
 <body onload="insert()">
 <script type="text/javascript">
 
+//variables after #
+var url_crid=null;
+var q=null;
+var term=null;
+var pr = window.location.hash;
+//alert(pr);
+if(pr){   
+  if(pr.match("crid://")){
+    url_crid=pr.substring(1);
+  }
+  if(pr.match("q=")){
+    q=pr.substring(3);
+  }
+  if(pr.match("term=")){
+    term=pr.substring(6);
+  }
+}
+
+
 var search_url = "http://dev.notu.be/2011/01/api/search"
 var suggest_url = "http://dev.notu.be/2011/01/api/suggest";
 var start_url="http://dev.notu.be/2011/01/api/random?fmt=json";
@@ -33,12 +52,14 @@ function insert2(script) {
 
 function do_search(txt){
 //alert(search_url+"?q="+txt+"&fmt=json ....");
+   window.location.hash="#q="+txt;
    insert2(search_url+"?q="+txt+"&fmt=json&user_id="+user_id);
 }
 
 
 function do_cat_search(txt){
 ///alert(search_url+"?cat="+txt+"&fmt=json ,,,,");
+   window.location.hash="#term="+txt;
    insert2(search_url+"?cat="+txt+"&fmt=json&user_id="+user_id);
 }
 
@@ -47,11 +68,11 @@ function do_cat_search(txt){
 function search_results(ob){
 //alert(ob.length)
 
-  var html = "<h4>Programmes about ";
+  var html = "<h3  align='center'>Programmes about ";
   if(ob.length==1){
     var t = ob[0]["term"];
     var tn = ob[0]["term_name"];
-    html=tn+"</h4>\n<ul><li>Sorry, nothing found</li>\n";
+    html=tn+"</h3>\n<ul><li>Sorry, nothing found</li>\n";
     suggest1(html)
     r.innerHTML=html;
   }else{
@@ -83,7 +104,7 @@ function search_results(ob){
            }
         }
 
-        html = html+"<li><b><a href=\"#\" onclick=\"javascript:refresh_suggestions('"+ob[i]["crid"]+"')\">"+fulltitle+"</a></b><p>"+ob[i]["text_date"]+" on "+ob[i]["channel"]+"</p></li>\n"
+        html = html+"<li><b><a href=\"#"+ob[i]["crid"]+"\" onclick=\"javascript:refresh_suggestions('"+ob[i]["crid"]+"')\">"+fulltitle+"</a></b><p>"+ob[i]["text_date"]+" on "+ob[i]["channel"]+"</p></li>\n"
 
      }
      html = html+"</ul>";
@@ -128,7 +149,7 @@ function recommendations(result){
                    var tn = catz[i]["term_name"];
                    tn = tn.toLowerCase();
                    var tnum = catz[i]["term"];
-                   cats = cats+"<a href=\"#\" onclick=\"javascript:do_cat_search('"+tnum+"');return false;\">"+tn+"</a> ";
+                   cats = cats+"<a href=\"#term="+tnum+"\" onclick=\"javascript:do_cat_search('"+tnum+"');return false;\">"+tn+"</a> ";
              }
              print_cats(cats);
           }
@@ -186,7 +207,7 @@ function recommendations(result){
           title(ti);
           var s1 ="";
           var s2 ="";
-          var s = "<ul>";
+          var s = "<h3 align='center'>Related Programmes</h3><ul>";
 
           if (suggestions.length>0){
 
@@ -203,7 +224,7 @@ function recommendations(result){
                    var tnum = categories[r2]["term"];
                    var freq = categories[r2]["term_frequency"];
                    tn = tn.toLowerCase();
-                   cats = cats+"<a href=\"#\" onclick=\"javascript:do_cat_search('"+tnum+"');return false;\">"+tn+"</a>";
+                   cats = cats+"<a href=\"#term="+tnum+"\" onclick=\"javascript:do_cat_search('"+tnum+"');return false;\">"+tn+"</a>";
                    cc = cc+1;
 
                    if (cc<categories.length){
@@ -233,14 +254,14 @@ function recommendations(result){
                 s = s+"<li>";
 
                 if(img){
-                   s = s+ "<div style=\"float:left;padding:10px\"><a href=\"#\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\"><img src='"+img+"' width='200' border='0'/></a></div>";
+                   s = s+ "<div style=\"float:left;padding:10px\"><a href=\"#crid="+crid1+"\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\"><img src='"+img+"' width='200' border='0'/></a></div>";
                 }
 
 
                 if (st1 && st1!="" && st1!=" "){
-                  s = s+"<div style=\"padding:10px\"><b><a href=\"#\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\">"+st1+": "+ct1+"</a></b>"
+                  s = s+"<div style=\"padding:10px\"><b><a href=\"#crid="+crid1+"\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\">"+st1+": "+ct1+"</a></b>"
                 }else{
-                  s = s+"<div style=\"padding:10px\"><b><a href=\"#\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\">"+ct1+"</a></b>"
+                  s = s+"<div style=\"padding:10px\"><b><a href=\"#crid="+crid1+"\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\">"+ct1+"</a></b>"
                 }
 
                 var playlist = " <big><a href=\"#\" title=\"Add to playlist\" onclick=\"javascript:playlist_add('"+crid1+"');return false;\">[+]</a></big> ";
@@ -289,12 +310,22 @@ function insert() {
 //     alert("ok! "+user_id);
    }
    show_playlist();
-   var headID = document.getElementsByTagName("head")[0];
-   var newScript = document.createElement('script');
-   newScript.type = 'text/javascript';
-   newScript.src = script+"&user_id="+user_id;
-   headID.appendChild(newScript);
+   
+   if(url_crid){
+    refresh_suggestions(url_crid);
+   }else if(q){
+    do_search(q);
+   }else if(term){
+    do_cat_search(term);
+   }else{
+    var headID = document.getElementsByTagName("head")[0];
+    var newScript = document.createElement('script');
+    newScript.type = 'text/javascript';
+    newScript.src = script;
+    headID.appendChild(newScript);
+   }
 }
+
 
 
 function show_playlist(){
@@ -465,7 +496,7 @@ function playlist(result){
                    var tnum = categories[r2]["term"];
                    var freq = categories[r2]["term_frequency"];
                    tn = tn.toLowerCase();
-                   cats = cats+"<a href=\"#\" onclick=\"javascript:do_cat_search('"+tnum+"');return false;\">"+tn+"</a>";
+                   cats = cats+"<a href=\"#term="+tnum+"\" onclick=\"javascript:do_cat_search('"+tnum+"');return false;\">"+tn+"</a>";
                    cc = cc+1;
 
                    if (cc<categories.length){
@@ -483,7 +514,7 @@ function playlist(result){
                 var text_date = suggestions[r]["text_date"];
                 var pid = suggestions[r]["pid"];
 
-                var playlist = " <a href=\"#\" onclick=\"javascript:playlist_add('"+crid1+"');return false;\">Add to playlist</a> ";
+                var playlist = " <a href=\"#crid="+crid1+"\" onclick=\"javascript:playlist_add('"+crid1+"');return false;\">Add to playlist</a> ";
 
                 if(st1){
                   st1 = capitalise(st1);
@@ -502,9 +533,9 @@ function playlist(result){
                 ss = ss+st1+"\n";
 
                 if (st1 && st1!="" && st1!=" "){
-                  s = s+"<div style=\"padding:10px\"><b><a href=\"#\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\">"+st1+": "+ct1+"</a></b>"
+                  s = s+"<div style=\"padding:10px\"><b><a href=\"#crid="+crid1+"\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\">"+st1+": "+ct1+"</a></b>"
                 }else{
-                  s = s+"<div style=\"padding:10px\"><b><a href=\"#\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\">"+ct1+"</a></b>"
+                  s = s+"<div style=\"padding:10px\"><b><a href=\"#crid="+crid1+"\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\">"+ct1+"</a></b>"
                 }
 
                 if(playlist){
