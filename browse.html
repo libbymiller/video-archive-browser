@@ -2,7 +2,9 @@
  <head>
   <meta http-equiv=" Content-Type" content="text/html;charset=UTF-8">
   <link type="text/css" rel="stylesheet" href="css/basic.css" />
+  <link rel="stylesheet" type="text/css" href="css/overlay-basic.css"/>
   <script type="text/javascript" src='lib/jquery.js'></script>
+  <script src="lib/jquery.tools.min.js"></script>
 
 
 <!--<meta name="viewport" content="width=1000" />-->
@@ -305,7 +307,7 @@ var script = start_url;
 function insert() {
    checkCookies();
    if(!checked){
-     alert("hi! your uuique id is "+user_id+". This is an experiment to... We will take good care of your data...");
+      popup_starter();
    }else{
 //     alert("ok! "+user_id);
    }
@@ -613,7 +615,41 @@ would like to ask us any questions.</p>
 <div id="footer">
 <small><span id="out"></span></small>
 </div>
+
+<!-- overlays -->
+<div class="simple_overlay" id="TandCs">
+<h3>hello</h3>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis pharetra tempus augue, et condimentum sapien 
+imperdiet vitae. Aliquam eget lobortis tellus. Cum sociis natoque penatibus et magnis dis parturient montes,
+nascetur ridiculus mus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae;
+Quisque non diam massa. Sed mollis interdum tempor. Cras ac nibh quis elit rhoncus viverra. Vivamus consectetur
+ipsum vitae diam hendrerit eget tincidunt elit tincidunt. Donec in lorem fermentum tellus pulvinar pulvinar vel
+vitae nulla. In vestibulum blandit lorem, eu lobortis sem vestibulum vitae. Curabitur varius turpis quis dui
+varius hendrerit vitae eget massa. Phasellus euismod erat sed nibh elementum ac suscipit augue bibendum.
+Phasellus sed quam sed orci feugiat sagittis. Sed velit dolor, scelerisque id interdum quis, tempus sed metus.
+</p>
+        
+</div>   
+
 </body>
+
+<script type="text/javascript">
+//initial overlay stuff, occurs when no cookie
+function popup_starter(){
+
+  $("#TandCs").overlay({
+        top: 100,
+        mask: {
+                color: '#111',
+                loadSpeed: 200,
+                opacity: 0.5
+        },
+        closeOnClick: true,
+        load: true
+  });
+}
+</script>
+
 
 </html>
 

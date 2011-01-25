@@ -1,0 +1,116 @@
+body{
+ background:#fff;
+ font-family: 'Lucida Grande','Helvetica Neue',Verdana,Arial,sans-serif;
+ color:#222;
+}
+
+.centre{
+  text-align:center;
+  padding:10px;
+}
+
+input.abutton
+{
+   border-style:solid;
+   border-color:#000;
+   background:#fff;
+}
+
+#footer
+{
+        clear: left;
+#        background: #ccc;
+        text-align: left;
+        padding: 5px;
+        height: 1%;
+
+}
+
+
+#related{
+
+       display: block;
+       height: 60px;
+       line-height: 60px;
+       font-size: 24px;
+       font-weight: bold;
+       text-indent: 56px;
+
+     background: #fff;
+     margin: 0px;
+     padding: 0px;
+}
+
+#header{
+
+       display: block;
+       height: 60px;
+       line-height: 60px;
+       font-size: 24px;
+       font-weight: bold;
+       text-indent: 56px;
+
+     width: 100%;
+     background: #ddd;
+     margin: 0px;
+     padding: 0px;
+}
+
+#header span.form{
+  position: absolute; right: 105px;
+}
+
+
+#wrapper {
+
+	position: relative;
+
+        margin: 0px;
+        padding: 0px;
+
+	text-align: left;
+	border:0;
+#        height: 675px;
+	width: 100%;
+clear:both;
+}
+
+
+#side-a {
+	padding: 20px;
+	border:0;
+	float: left;
+	width: 512px;
+        font-size: 20px;
+     
+}
+
+
+a:link {color:#333}
+a:active {color:#333}
+a:visited {color:#333}
+a:hover {color:#000}
+
+#suggestions1 { 
+	padding: 0px;
+	float: left;
+	width: 45%;
+        background: #fff;
+}
+
+
+ul {
+        list-style-type:none;
+	padding: 0px;
+	border:0;
+
+}
+li{
+
+	padding: 10px;
+	border:0;
+#	height: 200px;
+	color: #58626c;
+	border-bottom: solid #bbb 1px;
+}
+
