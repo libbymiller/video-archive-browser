@@ -311,7 +311,8 @@ function insert() {
    }else{
 //     alert("ok! "+user_id);
    }
-   show_playlist();
+   addPlaylistUrl(user_id);
+   //show_playlist();
    
    if(url_crid){
     refresh_suggestions(url_crid);
@@ -329,11 +330,23 @@ function insert() {
 }
 
 
+function addPlaylistUrl(user_id){
+  var a = document.getElementById("playlist");
+  var u ="http://dev.notu.be/2011/01/api/playlist?action=get&user_id="+user_id+"&fmt=html";
 
+  var html="<a href='"+u+"' rel='#overlay' style='text-decoration:none' id='playlist_wrapper'><button type='button'>Show Playlist2</button></a>";
+
+  a.innerHTML=html;
+  foo();
+}
+
+/*
 function show_playlist(){
+
   var i = document.getElementById("playlist");
   i.innerHTML="<a href=\"#\" onclick=\"javascript:playlist_get('"+user_id+"');return false;\">Show Playlist</a>"
 }
+*/
 
 function insert_with_src(sc) {
    var headID = document.getElementsByTagName("head")[0];
@@ -463,6 +476,9 @@ function playlist_delete(crid){
 
 }
 
+
+
+/*
 function playlist_get(crid){
    var u = "http://dev.notu.be/2011/01/api/playlist?action=get&user_id="+user_id+"&crid="+crid+"&fmt=json";
 
@@ -475,7 +491,7 @@ function playlist_get(crid){
 }
 
 //show playlist
-
+*/
 //process the script results
 function playlist(result){
 
@@ -574,6 +590,7 @@ function playlist(result){
   <div id="header">
     <span id="title">Browse Archive Video</span>
     <span class="form" id="playlist"></form>
+
   </div>
   <div id="wrapper">
 	<div id="container">
@@ -650,6 +667,35 @@ function popup_starter(){
 }
 </script>
 
+
+
+<!-- overlayed element -->
+<div class="simple_overlay" id="overlay">
+        <!-- the external content is loaded inside this tag -->
+        <div class="contentWrap"></div>
+</div>
+
+<script type="text/javascript">
+//$(function() {
+//                        alert("foo");
+function foo(){ 
+        // if the function argument is given to overlay,
+        // it is assumed to be the onBeforeLoad event listener
+        $("a[rel]").overlay({
+                mask: '#ddd',
+                closeOnClick: true,
+                onBeforeLoad: function() {
+                        // grab wrapper element inside content
+                        var wrap = this.getOverlay().find(".contentWrap");
+                        // load the page specified in the trigger
+                        wrap.load(this.getTrigger().attr("href"));
+                }
+
+        });
+//});
+}
+
+</script>
 
 </html>
 
