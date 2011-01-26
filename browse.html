@@ -479,6 +479,12 @@ function playlist_delete(crid){
 
 //playlist_get and playlist(results) is handled by html version using overlays
 
+
+function send_email(){
+ alert("email sent!");
+ $("#TandCs").data("overlay").close();
+}
+
 </script>
 
   <div id="header">
@@ -533,7 +539,7 @@ like to ask us any questions.
 
 <!-- overlays -->
 <div class="simple_overlay" id="TandCs">
-<h3>hello</h3>
+<h3>Hello!</h3>
 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis pharetra tempus augue, et condimentum sapien 
 imperdiet vitae. Aliquam eget lobortis tellus. Cum sociis natoque penatibus et magnis dis parturient montes,
 nascetur ridiculus mus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae;
@@ -543,6 +549,11 @@ vitae nulla. In vestibulum blandit lorem, eu lobortis sem vestibulum vitae. Cura
 varius hendrerit vitae eget massa. Phasellus euismod erat sed nibh elementum ac suscipit augue bibendum.
 Phasellus sed quam sed orci feugiat sagittis. Sed velit dolor, scelerisque id interdum quis, tempus sed metus.
 </p>
+<form onsubmit="javascript:send_email();return false;">
+Your email: <input type="text" name="email" value=""/><br />
+I agree to the terms and conditions: <input type="checkbox" name="agree" value=""/><br />
+<input type="submit" name="go" value="Send email and continue" />
+</form>
         
 </div>   
 
@@ -567,7 +578,6 @@ function popup_starter(){
 
 //add to playlist
 function playlist(result){
-
           var suggestions = result["suggestions"];
 
           if (suggestions.length>0){
@@ -582,18 +592,19 @@ function playlist(result){
           }
 
 
-  setTimeout('$("#playlistadded").data("overlay").close();', 2000);
+  setTimeout('$("#playlistadded").data("overlay").close();', 1500);
 
   $("#playlistadded").overlay({
         top: 100,
         mask: {
                 color: '#111',
-                loadSpeed: 200,
+                loadSpeed: 100,
                 opacity: 0.5
         },
         closeOnClick: true,
-        load: true
+        load: false
   });
+  $("#playlistadded").data("overlay").load();
 }
 
 </script>
