@@ -35,6 +35,7 @@ if(pr){
   }
 }
 
+var playlist_changed=false;
 
 var search_url = "http://dev.notu.be/2011/01/api/search"
 var suggest_url = "http://dev.notu.be/2011/01/api/suggest";
@@ -303,12 +304,18 @@ function programme(thing){
 var script = start_url;
 
 function do_random(){
-alert("ok");
     var headID = document.getElementsByTagName("head")[0];
     var newScript = document.createElement('script');
     newScript.type = 'text/javascript';
     newScript.src = script;
     headID.appendChild(newScript); 
+}
+
+
+function showPlaylistButton(user_id){
+//<button type='button' onclick='javascript:show_playlist();return false;'>Show Playlist</button></span>
+  var d = document.getElementById("playlistButton");
+  d.innerHTML="<button type=\"button\" onclick=\"javascript:show_playlist('"+user_id+"');return false;\">Show Playlist</button>";
 }
 
 //inject start script
@@ -320,7 +327,9 @@ function insert() {
    }else{
 //     alert("ok! "+user_id);
    }
-   addPlaylistUrl(user_id);
+   
+
+   getPlaylist(user_id);
    //show_playlist();
    
    if(url_crid){
@@ -339,7 +348,103 @@ function insert() {
 }
 
 
+//ok: need to load playlist before we start and keep it loaded
+// at any time we need to show it
+// or to filter using it
+function getPlaylist(user_id){
+    var u ="http://dev.notu.be/2011/01/api/playlist?action=get&user_id="+user_id+"&fmt=json";
+//alert(u);
+    var headID = document.getElementsByTagName("head")[0];
+    var newScript = document.createElement('script');
+    newScript.type = 'text/javascript';
+    newScript.src = u;
+    headID.appendChild(newScript); 
+    playlist_changed=false;
+}
+
+function playlist_get_process(result){
+
+          var suggestions = result["suggestions"];
+          var s = "";
+          if (suggestions.length>0){
+          
+            var num = suggestions.length/2;
+            for (r in suggestions){
+                var st1 = suggestions[r]["series_title"];
+                var ct1 = suggestions[r]["core_title"];
+                var crid1 = suggestions[r]["crid"];
+                var desc = suggestions[r]["description"];
+                var ppid = suggestions[r]["pid"];
+                var img = suggestions[r]["image"];
+                var pn1 = suggestions[r]["programme_number"];
+                var ddtt = suggestions[r]["date_time"];
+                var text_date = suggestions[r]["text_date"];
+                var pid = suggestions[r]["pid"];
+                var playlist = " <a href=\"#\" onclick=\"javascript:playlist_delete('"+crid1+"');return false;\">Delete from playlist</a> ";
+                if(st1){
+                  st1 = capitalise(st1);
+                }
+                if(ct1){
+                  ct1 = capitalise(ct1);
+                }
+                s = s+"<div id=\""+crid1+"\">";
+
+                if(img){
+                   s = s+ "<div style=\"float:left;padding:10px\"><img src='"+img+"' width='200'/></div>";
+                }
+                if (st1 && st1!="" && st1!=" "){
+                  s = s+"<div style=\"padding:10px\"><b><a href=\"#\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\">"+st1+": "+ct1+"</a></b>"
+                }else{
+                  s = s+"<div style=\"padding:10px\"><b><a href=\"#\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\">"+ct1+"</a></b>"
+                }
+
+                if(desc){
+                   s = s+"<p>"+desc;
+                   if(text_date){
+                     s = s+" From "+text_date;
+                   }
+                   if(pid){
+                     s = s+" <br /><a href='http://www.bbc.co.uk/programmes/"+pid+"' target='_blank'>BBC Website</a>";
+                   }
+                   s = s+"</p>\n"+playlist;
+                }else{//horrible, sorry!
+                  s = s+"<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>\n"+playlist;
+                }
+                s = s+ "</div></div>\n";
+
+              }//end for
+            }//end if
+                 
+
+  var a = document.getElementById("playlistget");
+  a.innerHTML=s;
+  //make show playlist button vsitble
+  showPlaylistButton(user_id);
+
+}
+
+function show_playlist(user_id){
+  if(playlist_changed){
+    getPlaylist(user_id);
+  }
+
+  $("#playlistget").overlay({
+        top: 100,
+        mask: {
+                color: '#111',
+                loadSpeed: 100,
+                opacity: 0.5
+        },
+        closeOnClick: true,
+        load: false
+  });
+  $("#playlistget").data("overlay").load();
+
+}
+
+/*
 function addPlaylistUrl(user_id){
+
   var a = document.getElementById("playlist");
   var u ="http://dev.notu.be/2011/01/api/playlist?action=get&user_id="+user_id+"&fmt=html";
 
@@ -348,6 +453,7 @@ function addPlaylistUrl(user_id){
   a.innerHTML=html;
   foo();
 }
+*/
 
 /*
 function show_playlist(){
@@ -464,6 +570,7 @@ function eraseCookie(name) {
 //playlist stuff
 
 function playlist_add(crid){
+   playlist_changed=true;
    var u = "http://dev.notu.be/2011/01/api/playlist?action=add&user_id="+user_id+"&crid="+crid+"&fmt=json";
 
    var headID = document.getElementsByTagName("head")[0];
@@ -475,8 +582,11 @@ function playlist_add(crid){
 }
 
 function playlist_delete(crid){
-   var u = "http://dev.notu.be/2011/01/api/playlist?action=delete&user_id="+user_id+"&crid="+crid+"&fmt=json";
+   playlist_changed=true;
+//alert("http://dev.notu.be/2011/01/api/playlist?action=delete&user_id="+user_id+"&crid="+crid+"&fmt=json");
+   document.getElementById(crid).style.display = 'none';
 
+   var u = "http://dev.notu.be/2011/01/api/playlist?action=delete&user_id="+user_id+"&crid="+crid+"&fmt=json";
    var headID = document.getElementsByTagName("head")[0];
    var newScript = document.createElement('script');
    newScript.type = 'text/javascript';
@@ -498,7 +608,8 @@ function send_email(){
 
   <div id="header">
     <span id="title">Browse Archive Video</span>
-    <span class="form" id="playlist"></span>
+    <span class="form" id="playlistButton"></span>
+<!--<button type='button' onclick='javascript:show_playlist();return false;'>Show Playlist</button></span>-->
     <span class="random" id="random"><button type='button' onclick='javascript:do_random();return false;'>shuffle!</button></span>
 
   </div>
@@ -587,7 +698,7 @@ function popup_starter(){
 
 
 //add to playlist
-function playlist(result){
+function playlist_add_process(result){
           var suggestions = result["suggestions"];
 
           if (suggestions.length>0){
@@ -617,6 +728,13 @@ function playlist(result){
   $("#playlistadded").data("overlay").load();
 }
 
+//del from playlist
+function playlist_del_process(result){
+//alert("deleting");
+}
+
+
+
 </script>
 
 
@@ -633,9 +751,18 @@ function playlist(result){
         <div class="contentWrap"></div>
 </div>
 
+<!-- overlayed element -->
+<div class="simple_overlay" id="playlistget">
+        <!-- the external content is loaded inside this tag -->
+        <div class="contentWrap"></div>
+</div>
+
 <script type="text/javascript">
 //$(function() {
 //                        alert("foo");
+
+
+/*
 function foo(){ 
         // if the function argument is given to overlay,
         // it is assumed to be the onBeforeLoad event listener
@@ -652,7 +779,7 @@ function foo(){
         });
 //});
 }
-
+*/
 </script>
 
 </html>
