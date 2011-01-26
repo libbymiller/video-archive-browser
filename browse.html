@@ -477,119 +477,13 @@ function playlist_delete(crid){
 }
 
 
-
-/*
-function playlist_get(crid){
-   var u = "http://dev.notu.be/2011/01/api/playlist?action=get&user_id="+user_id+"&crid="+crid+"&fmt=json";
-
-   var headID = document.getElementsByTagName("head")[0];
-   var newScript = document.createElement('script');
-   newScript.type = 'text/javascript';
-   newScript.src = u;
-   headID.appendChild(newScript);
-
-}
-
-//show playlist
-*/
-//process the script results
-function playlist(result){
-
-          var suggestions = result["suggestions"];
-          var s="";
-          var ss="";
-
-          if (suggestions.length>0){
-
-            var count = 0;
-            var num = suggestions.length/2;
-            for (r in suggestions){
-                count = count + 1;
-                var categories = suggestions[r]["categories"];
-                var cats = "";
-                var cc = 0;
-                for (r2 in categories){
-                   var tn = categories[r2]["term_name"];
-                   var wd = categories[r2]["word"];
-                   var tnum = categories[r2]["term"];
-                   var freq = categories[r2]["term_frequency"];
-                   tn = tn.toLowerCase();
-                   cats = cats+"<a href=\"#term="+tnum+"\" onclick=\"javascript:do_cat_search('"+tnum+"');return false;\">"+tn+"</a>";
-                   cc = cc+1;
-
-                   if (cc<categories.length){
-                       cats = cats+", ";
-                   }
-                }
-                var st1 = suggestions[r]["series_title"];
-                var ct1 = suggestions[r]["core_title"];
-                var crid1 = suggestions[r]["crid"];
-                var desc = suggestions[r]["description"];
-                var ppid = suggestions[r]["pid"];
-                var img = suggestions[r]["image"];
-                var pn1 = suggestions[r]["programme_number"];
-                var ddtt = suggestions[r]["date_time"];
-                var text_date = suggestions[r]["text_date"];
-                var pid = suggestions[r]["pid"];
-
-                var playlist = " <a href=\"#crid="+crid1+"\" onclick=\"javascript:playlist_add('"+crid1+"');return false;\">Add to playlist</a> ";
-
-                if(st1){
-                  st1 = capitalise(st1);
-                }
-                if(ct1){
-                  ct1 = capitalise(ct1);
-                }
-
-
-                s = s+"<li>";
-
-                if(img){
-                   s = s+ "<div style=\"float:left;padding:10px\"><img src='"+img+"' width='200'/></div>";
-                }
-
-                ss = ss+st1+"\n";
-
-                if (st1 && st1!="" && st1!=" "){
-                  s = s+"<div style=\"padding:10px\"><b><a href=\"#crid="+crid1+"\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\">"+st1+": "+ct1+"</a></b>"
-                }else{
-                  s = s+"<div style=\"padding:10px\"><b><a href=\"#crid="+crid1+"\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\">"+ct1+"</a></b>"
-                }
-
-                if(playlist){
-                 s = s+""+playlist;
-                }
-                if(desc){
-                   s = s+"<p>"+desc;
-                   if(text_date){
-                     s = s+" From "+text_date;
-                   }
-                   if(pid){
-                     s = s+" <a href='http://www.bbc.co.uk/programmes/"+pid+"' target='_blank'>More about this programme</a>";
-                   }
-                   s = s+"</p>\n";
-                }else{//horrible, sorry!
-                  s = s+"<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>\n"+playlist;
-                }
-                if(cats && cats!=""){
-                  s = s+ " Related by: "+cats+"\n";
-                }
-                s = s+ "</div></li>\n";
-            }
-          
-            s = s + "</ul>";
-//            suggest1(s);
-            alert(ss);
-          }
-}
-
+//playlist_get and playlist(results) is handled by html version using overlays
 
 </script>
 
-<body>
   <div id="header">
     <span id="title">Browse Archive Video</span>
-    <span class="form" id="playlist"></form>
+    <span class="form" id="playlist"></span>
 
   </div>
   <div id="wrapper">
@@ -601,30 +495,34 @@ function playlist(result){
 
 
                    <div class="centre">
-
+ 
                    </div>
 <p>
 <span id="telly">
+Thank you for participating in our research.
+<br />
+<small>
+Please spend as much or as little time as you like over the next 7 days to browse through this video collection 
+and add programmes that you'd like to watch to your playlist. You can use this app as many times as 
+you want during the course of the week.
+<br />
 
-<p>Thank you for participating in our research.</p><p>Please spend as much or as little time as you like over 
-the next 7 days to browse through this video collection and add programmes that you'd like to watch 
-to your playlist by clicking on <b>"[+]"</b> next to a programme. You can use this app as many times as you want during the course of the week.</p><p>When 
-you've finished creating your playlist, you will be given a URL for it. You can use this URL to access the 
-playlist until the end of the NoTube project (March 2012).</p><p>Please email us if you come across any bugs or 
-would like to ask us any questions.</p>
-
-</span>
+When you've finished creating your playlist, you will be given a URL for it. You can use this URL to access the 
+playlist until the end of the NoTube project (March 2012). Please email us if you come across any bugs or would 
+like to ask us any questions.
+</small>
+</span>        
 <span id="pidurl"></span>
 <br />
 <span id="cats"></span>
 </p>
-		</div>
-		
-
+                </div>
+                   
  
-
+                      
                 <span id="suggestions1"></span>
-	</div>
+
+
 
   </div>
 </div>
@@ -665,12 +563,51 @@ function popup_starter(){
         load: true
   });
 }
+
+
+//add to playlist
+function playlist(result){
+
+          var suggestions = result["suggestions"];
+
+          if (suggestions.length>0){
+             var st1 = suggestions[0]["series_title"];
+             var ct1 = suggestions[0]["core_title"];
+             var ti = st1 +": "+ct1;
+             var x = document.getElementById("playlistadded");
+             x.innerHTML="Added "+ti+" to your playlist";
+          }else{
+             var x = document.getElementById("playlistadded");
+             x.innerHTML="Sorry, someting went wrong.";            
+          }
+
+
+  setTimeout('$("#playlistadded").data("overlay").close();', 2000);
+
+  $("#playlistadded").overlay({
+        top: 100,
+        mask: {
+                color: '#111',
+                loadSpeed: 200,
+                opacity: 0.5
+        },
+        closeOnClick: true,
+        load: true
+  });
+}
+
 </script>
 
 
 
 <!-- overlayed element -->
 <div class="simple_overlay" id="overlay">
+        <!-- the external content is loaded inside this tag -->
+        <div class="contentWrap"></div>
+</div>
+
+<!-- overlayed element -->
+<div class="simple_overlay" id="playlistadded">
         <!-- the external content is loaded inside this tag -->
         <div class="contentWrap"></div>
 </div>
