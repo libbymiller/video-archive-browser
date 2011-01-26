@@ -302,6 +302,15 @@ function programme(thing){
 
 var script = start_url;
 
+function do_random(){
+alert("ok");
+    var headID = document.getElementsByTagName("head")[0];
+    var newScript = document.createElement('script');
+    newScript.type = 'text/javascript';
+    newScript.src = script;
+    headID.appendChild(newScript); 
+}
+
 //inject start script
 
 function insert() {
@@ -490,6 +499,7 @@ function send_email(){
   <div id="header">
     <span id="title">Browse Archive Video</span>
     <span class="form" id="playlist"></span>
+    <span class="random" id="random"><button type='button' onclick='javascript:do_random();return false;'>shuffle!</button></span>
 
   </div>
   <div id="wrapper">
