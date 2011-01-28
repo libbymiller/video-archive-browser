@@ -5,6 +5,7 @@
   <link rel="stylesheet" type="text/css" href="css/overlay-basic.css"/>
   <script type="text/javascript" src='lib/jquery.js'></script>
   <script src="lib/jquery.tools.min.js"></script>
+  <script src="lib/jquery.ba-hashchange.js"></script>
 
 
 <!--<meta name="viewport" content="width=1000" />-->
@@ -35,8 +36,43 @@ if(pr){
   }
 }
 
-var playlist_changed=false;
+//hashchange stuff
 
+$(function(){
+  // Bind the event.
+  $(window).hashchange( function(){
+    // Alerts every time the hash changes!
+   var pr = location.hash;
+   if(pr){   
+     if(pr.match("crid://")){
+       url_crid=pr.substring(1);
+       if(url_crid){
+//alert(url_crid);
+        refresh_suggestions(url_crid);
+       }
+     }
+     if(pr.match("q=")){
+       q=pr.substring(3);
+       if(q){
+         do_search(q);
+       }
+     }
+     if(pr.match("term=")){
+       term=pr.substring(6);
+       if(term){
+         do_cat_search(term);
+       }
+     }
+
+   }
+
+  });
+ 
+  // Trigger the event (useful on page load).
+  $(window).hashchange();
+});
+
+var playlist_changed=false;
 var search_url = "http://dev.notu.be/2011/01/api/search"
 var suggest_url = "http://dev.notu.be/2011/01/api/suggest";
 var start_url="http://dev.notu.be/2011/01/api/random?fmt=json";
@@ -166,7 +202,7 @@ function recommendations(result){
                image("<img src=\""+img+"\" width=\"512\"/>")
             }
           }else{
-            image("<img src=\"images/bbc_logo.jpg\" width=\"512\"/>");
+///            image("<img src=\"images/bbc_logo.jpg\" width=\"512\"/>");
 
             if(!pn){
             }else{
@@ -257,14 +293,14 @@ function recommendations(result){
                 s = s+"<li>";
 
                 if(img){
-                   s = s+ "<div style=\"float:left;padding:10px\"><a href=\"#crid="+crid1+"\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\"><img src='"+img+"' width='200' border='0'/></a></div>";
+                   s = s+ "<div style=\"float:left;padding:10px\"><a href=\"#"+crid1+"\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\"><img src='"+img+"' width='200' border='0'/></a></div>";
                 }
 
 
                 if (st1 && st1!="" && st1!=" "){
-                  s = s+"<div style=\"padding:10px\"><b><a href=\"#crid="+crid1+"\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\">"+st1+": "+ct1+"</a></b>"
+                  s = s+"<div style=\"padding:10px\"><b><a href=\"#"+crid1+"\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\">"+st1+": "+ct1+"</a></b>"
                 }else{
-                  s = s+"<div style=\"padding:10px\"><b><a href=\"#crid="+crid1+"\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\">"+ct1+"</a></b>"
+                  s = s+"<div style=\"padding:10px\"><b><a href=\"#"+crid1+"\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\">"+ct1+"</a></b>"
                 }
 
                 var playlist = " <big><a href=\"#\" title=\"Add to playlist\" onclick=\"javascript:playlist_add('"+crid1+"');return false;\">[+]</a></big> ";
@@ -315,7 +351,10 @@ function do_random(){
 function showPlaylistButton(user_id){
 //<button type='button' onclick='javascript:show_playlist();return false;'>Show Playlist</button></span>
   var d = document.getElementById("playlistButton");
-  d.innerHTML="<button type=\"button\" onclick=\"javascript:show_playlist('"+user_id+"');return false;\">Show Playlist</button>";
+  d.innerHTML="<small><a href=\"#\" onclick=\"javascript:show_playlist('"+user_id+"');return false;\">Show Playlist</a></small>";
+  var dx = document.getElementById("playlistButtonXML");
+  dx.innerHTML="<small><a href=\"http://dev.notu.be/2011/01/api/playlist?action=get&user_id="+user_id+"&fmt=xml\" target=\"_blank\">XML</a></small>";
+
 }
 
 //inject start script
@@ -609,15 +648,15 @@ function send_email(){
   <div id="header">
     <span id="title">Browse Archive Video</span>
     <span class="form" id="playlistButton"></span>
+    <span class="playlistXML" id="playlistButtonXML"></span>
 <!--<button type='button' onclick='javascript:show_playlist();return false;'>Show Playlist</button></span>-->
-    <span class="random" id="random"><button type='button' onclick='javascript:do_random();return false;'>shuffle!</button></span>
+    <span class="random" id="random"><small><a href="#" onclick='javascript:do_random();return false;'>shuffle!</a></small></span>
 
   </div>
   <div id="wrapper">
 	<div id="container">
 		<div id="side-a">
                   <span id="image">
-                     <img src="images/bbc_logo.jpg" width="512"/>
                   </span>
 
 
