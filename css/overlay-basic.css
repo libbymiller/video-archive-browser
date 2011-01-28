@@ -13,9 +13,43 @@
 	width:675px;	
 	min-height:200px;
 	border:1px solid #666;
+        padding:10px;
 	
 	/* CSS3 styling for latest browsers */
 	-moz-box-shadow:0 0 90px 5px #000;
 	-webkit-box-shadow: 0 0 90px #000;	
 }
 
+.small_overlay {
+	
+	/* must be initially hidden */
+	display:none;
+	
+	/* place overlay on top of other elements */
+	z-index:10000;
+	
+	/* styling */
+	background-color:#fff;
+	
+	width:300px;	
+	min-height:100px;
+	border:1px solid #666;
+        padding:10px;
+	
+	/* CSS3 styling for latest browsers */
+	-moz-box-shadow:0 0 90px 5px #000;
+	-webkit-box-shadow: 0 0 90px #000;	
+}
+
+
+
+	/* container for external content. uses vertical scrollbar, if needed */
+div.contentWrap {
+	height:441px;
+	overflow-y:auto;
+}
+
+#playlistget {
+	height:441px;
+	overflow-y:auto;
+}

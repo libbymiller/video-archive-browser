@@ -197,7 +197,7 @@ function recommendations(result){
 
           if(pid){
             if(description){
-               telly(description);
+               telly("<p>"+description+"</p>");
             }
 
             if(img){
@@ -210,9 +210,9 @@ function recommendations(result){
             }else{
 
               if(description){
-                telly(description);
+                telly("<p>"+description+"</p>");
               }else{
-                telly("No description found");
+                telly("<p>No description found</p>");
               }
             }
           }
@@ -247,7 +247,7 @@ function recommendations(result){
 
           var s="";
           var term_term="Related by";
-          if(ct && st){
+          if(ct || st){
             title(ti);
             s = "<h3 style='padding-left:8px'>Related Programmes</h3>";
           }else{
@@ -336,7 +336,7 @@ function recommendations(result){
 
 function programme(thing){
  var desc = thing["programme"]["medium_synopsis"];
- telly(desc);
+ telly("<p>"+desc+"</p>");
 
 }
 
@@ -665,20 +665,23 @@ function send_email(){
 
 
 <p>
-<span id="telly">
+<div id="telly">
+<p>
 Thank you for participating in our research.
-<br />
-<small>
-Please spend as much or as little time as you like over the next 7 days to browse through this video collection 
-and add programmes that you'd like to watch to your playlist. You can use this app as many times as 
-you want during the course of the week.
-<br />
+</p></p>
 
-When you've finished creating your playlist, you will be given a URL for it. You can use this URL to access the 
-playlist until the end of the NoTube project (March 2012). Please email us if you come across any bugs or would 
-like to ask us any questions.
-</small>
-</span>        
+Please spend as much or as little time as you like over the next seven days to browse through this video 
+collection and add programmes that you'd like to watch to your playlist using the <big>[+]</big> link beside 
+each programme. If you get stuck, click on 'shuffle' to get a new random set of programmes.
+</p></p>
+
+You can use this application as many times as you want during the course of the week. You can 
+access the playlist you make until the end of the NoTube project (March 2012). See the <a 
+href="help.html">help</a> for more information about how you can use the playlist.
+</p></p>
+Please email us if you come across any bugs or would like to ask us any questions.
+</p>
+</div>
 <span id="pidurl"></span>
 <br />
 <span id="cats"></span>
@@ -786,7 +789,7 @@ function playlist_del_process(result){
 </div>
 
 <!-- overlayed element -->
-<div class="simple_overlay" id="playlistadded">
+<div class="small_overlay" id="playlistadded">
         <!-- the external content is loaded inside this tag -->
         <div class="contentWrap"></div>
 </div>
