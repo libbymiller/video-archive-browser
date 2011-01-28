@@ -202,10 +202,10 @@ function recommendations(result){
             if(description){
                telly("<p>"+description+"</p>");
             }
-
             if(img){
                image("<img src=\""+img+"\" width=\"512\"/>")
             }
+
           }else{
 ///            image("<img src=\"images/bbc_logo.jpg\" width=\"512\"/>");
 
@@ -503,26 +503,6 @@ function show_cat_search(){
 
 }
 
-/*
-function addPlaylistUrl(user_id){
-
-  var a = document.getElementById("playlist");
-  var u ="http://dev.notu.be/2011/01/api/playlist?action=get&user_id="+user_id+"&fmt=html";
-
-  var html="<a href='"+u+"' rel='#overlay' style='text-decoration:none' id='playlist_wrapper'><button type='button'>Show Playlist2</button></a>";
-
-  a.innerHTML=html;
-  foo();
-}
-*/
-
-/*
-function show_playlist(){
-
-  var i = document.getElementById("playlist");
-  i.innerHTML="<a href=\"#\" onclick=\"javascript:playlist_get('"+user_id+"');return false;\">Show Playlist</a>"
-}
-*/
 
 function insert_with_src(sc) {
    var headID = document.getElementsByTagName("head")[0];
@@ -538,11 +518,11 @@ function insert_with_src(sc) {
 //3. finds descriptions for all of them
 
 function refresh_suggestions(crid){
-    //close the overlay if its open
+    //close the cat search overlay if it's open
     if($("#cat_search").data("overlay")){
       $("#cat_search").data("overlay").close();
     }
-    //close the overlay if its open
+    //close the playlist overlay if it's open
     if($("#playlistget").data("overlay")){
       $("#playlistget").data("overlay").close();
     }
@@ -717,7 +697,8 @@ Please email us if you come across any bugs or would like to ask us any question
  
                       
                 <span id="suggestions1"></span>
-
+<!-- for long descriptions-->
+<div id="telly2"></div>
 
 
   </div>
@@ -831,30 +812,6 @@ function playlist_del_process(result){
         <div class="contentWrap"></div>
 </div>
 
-
-<script type="text/javascript">
-//$(function() {
-//                        alert("foo");
-
-
-/*
-function foo(){ 
-        // if the function argument is given to overlay,
-        // it is assumed to be the onBeforeLoad event listener
-        $("a[rel]").overlay({
-                mask: '#ddd',
-                closeOnClick: true,
-                onBeforeLoad: function() {
-                        // grab wrapper element inside content
-                        var wrap = this.getOverlay().find(".contentWrap");
-                        // load the page specified in the trigger
-                        wrap.load(this.getTrigger().attr("href"));
-                }
-
-        });
-//});
-}
-*/
 </script>
 
 </html>
