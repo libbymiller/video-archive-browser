@@ -181,21 +181,23 @@ function recommendations(result){
           var channel = result["channel"];
           var description = result["description"];
           var catz = result["categories"];
+        
 
           if(catz){
-             var cats ="<b>More programmes about:</b> ";
+             var cats ="<span class='cat'><b>More programmes about:</b> ";
              for(var i in catz){
                    var tn = catz[i]["term_name"];
                    tn = tn.toLowerCase();
                    var tnum = catz[i]["term"];
                    cats = cats+"<a href=\"#term="+tnum+"\" onclick=\"javascript:do_cat_search('"+tnum+"');return false;\">"+tn+"</a> ";
              }
+             cats = cats+"</span>";
              print_cats(cats);
           }
 
           if(pid){
             if(description){
-               telly(description+" <p><a href='http://www.bbc.co.uk/programmes/"+pid+"' target='_blank'>More about this programme</a></p>");
+               telly(description);
             }
 
             if(img){
@@ -240,13 +242,21 @@ function recommendations(result){
 
           var playlist = " <big><a href=\"#\" title=\"Add to playlist\" onclick=\"javascript:playlist_add('"+crid+"');return false;\">[+]</a></big> ";
           if(crid){
-            ti = playlist+""+ti;
+            ti = ti+""+playlist;
           }
 
-          title(ti);
+          var s="";
+          var term_term="Related by";
+          if(ct && st){
+            title(ti);
+            s = "<h3 style='padding-left:8px'>Related Programmes</h3>";
+          }else{
+            s = "<h3 style='padding-left:8px'>Random Selection</h3>";
+            term_term="More programmes about";
+
+          }
           var s1 ="";
           var s2 ="";
-          var s = "<h3 align='center'>Related Programmes</h3><ul>";
 
           if (suggestions.length>0){
 
@@ -290,17 +300,16 @@ function recommendations(result){
                 }
 
 
-                s = s+"<li>";
-
                 if(img){
-                   s = s+ "<div style=\"float:left;padding:10px\"><a href=\"#"+crid1+"\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\"><img src='"+img+"' width='200' border='0'/></a></div>";
+
+                   s = s+ "<div class=\"rec\"><a href=\"#"+crid1+"\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\"><img src='"+img+"' width='150' border='0'/></a></div>";
                 }
 
 
                 if (st1 && st1!="" && st1!=" "){
-                  s = s+"<div style=\"padding:10px\"><b><a href=\"#"+crid1+"\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\">"+st1+": "+ct1+"</a></b>"
+                  s = s+"<div class=\"rectext\"> <b><a href=\"#"+crid1+"\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\">"+st1+": "+ct1+"</a></b>"
                 }else{
-                  s = s+"<div style=\"padding:10px\"><b><a href=\"#"+crid1+"\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\">"+ct1+"</a></b>"
+                  s = s+"<div class=\"rectext\"> <b><a href=\"#"+crid1+"\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\">"+ct1+"</a></b>"
                 }
 
                 var playlist = " <big><a href=\"#\" title=\"Add to playlist\" onclick=\"javascript:playlist_add('"+crid1+"');return false;\">[+]</a></big> ";
@@ -309,24 +318,18 @@ function recommendations(result){
                 }
 
                 if(text_date){
-                   s = s+"<br /><small>"+text_date+"</small>";
+                   s = s+"<br /><small>"+text_date+"</small><br />";
                 }
                 if(desc){
-                   s = s+"<p>"+desc;
-                   if(pid){
-                     s = s+" <a href='http://www.bbc.co.uk/programmes/"+pid+"' target='_blank'>More about this programme</a>";
-                   }
-                   s = s+"</p>\n"
-                }else{//horrible, sorry!
-                  s = s+"<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>\n";
+                   s = s+""+desc;
                 }
                 if(cats && cats!=""){
-                  s = s+ " Related by: "+cats+"\n";
+                  s = s+ "<br /><span class=\"cat\">"+term_term+": "+cats+"</span>\n";
                 }
-                s = s+ "</div></li>\n";
+                s = s+ "</div><div style=\"clear:both;\"></div>\n";
             }
           
-            s = s + "</ul>";
+            s = s + "</div>";
             suggest1(s);
           }
 }
@@ -533,7 +536,8 @@ function telly(msg) {
 }
 function title(msg) {
   var out = document.getElementById('title');
-  out.innerHTML = msg+" <small>("+user_id+")</small>";
+//  out.innerHTML = msg+" <small>("+user_id+")</small>";
+  out.innerHTML = msg;
 }
 function image(msg) {
   var out = document.getElementById('image');
@@ -646,7 +650,6 @@ function send_email(){
 </script>
 
   <div id="header">
-    <span id="title">Browse Archive Video</span>
     <span class="form" id="playlistButton"></span>
     <span class="playlistXML" id="playlistButtonXML"></span>
 <!--<button type='button' onclick='javascript:show_playlist();return false;'>Show Playlist</button></span>-->
@@ -655,14 +658,12 @@ function send_email(){
   </div>
   <div id="wrapper">
 	<div id="container">
-		<div id="side-a">
+		<div id="side-a">	
+                  <h3 id="title">Browse Archive Video</h3>
                   <span id="image">
                   </span>
 
 
-                   <div class="centre">
- 
-                   </div>
 <p>
 <span id="telly">
 Thank you for participating in our research.

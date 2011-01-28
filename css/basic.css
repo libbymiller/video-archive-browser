@@ -32,8 +32,8 @@ input.abutton
        display: block;
        height: 60px;
        line-height: 60px;
-       font-size: 24px;
-       font-weight: bold;
+       #font-size: 24px;
+       #font-weight: bold;
        text-indent: 56px;
 
      background: #fff;
@@ -57,6 +57,12 @@ input.abutton
 }
 
 #header span.form{
+  position: absolute; right: 250px;
+}
+#header span.random{
+  position: absolute; right: 400px;
+}
+#header span.playlistXML{
   position: absolute; right: 105px;
 }
 
@@ -77,11 +83,12 @@ clear:both;
 
 
 #side-a {
-	padding: 20px;
+	padding-right: 20px;
+	padding-left: 20px;
 	border:0;
 	float: left;
 	width: 512px;
-        font-size: 20px;
+#        font-size: 20px;
      
 }
 
@@ -107,10 +114,24 @@ ul {
 }
 li{
 
-	padding: 10px;
+	padding: 0px;
 	border:0;
 #	height: 200px;
 	color: #58626c;
 	border-bottom: solid #bbb 1px;
 }
 
+div.rec{
+float: left; 
+padding-left: 10px;
+padding-right: 10px;
+padding-bottom: 5px;
+}
+div.rectext{
+padding: 5px;
+font-size: 14px;
+}
+span.cat{
+padding: 2px;
+background: #ddd;
+}
