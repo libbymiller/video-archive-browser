@@ -91,8 +91,8 @@ function insert2(script) {
 
 function do_search(txt){
 //alert(search_url+"?q="+txt+"&fmt=json ....");
-   window.location.hash="#q="+txt;
-   insert2(search_url+"?q="+txt+"&fmt=json&user_id="+user_id);
+   window.location.hash="#q="+escape(txt);
+   insert2(search_url+"?q="+escape(txt)+"&fmt=json&user_id="+user_id);
 }
 
 
@@ -195,7 +195,7 @@ function recommendations(result){
                    var tnum = catz[i]["term"];
                    var freq = catz[i]["freq"];
                    if(freq > 1){ //i.e. if it links to sometign other than this
-                     cats = cats+"<a href=\"#term="+tnum+"\" onclick=\"javascript:do_cat_search('"+tnum+"');return false;\">"+tn+"</a> ";
+                     cats = cats+"<a href=\"#term="+tnum+"\" onclick=\"javascript:do_cat_search('"+escape(tnum)+"');return false;\">"+tn+"</a> ";
                    }
              }
              if(cats!=""){
@@ -286,7 +286,7 @@ function recommendations(result){
                    var tnum = categories[r2]["term"];
                    var freq = categories[r2]["term_frequency"];
                    tn = tn.toLowerCase();
-                   cats = cats+"<a href=\"#term="+tnum+"\" onclick=\"javascript:do_cat_search('"+tnum+"');return false;\">"+tn+"</a>";
+                   cats = cats+"<a href=\"#term="+tnum+"\" onclick=\"javascript:do_cat_search('"+escape(tnum)+"');return false;\">"+tn+"</a>";
                    cc = cc+1;
 
                    if (cc<categories.length){
@@ -402,9 +402,9 @@ function insert() {
    //show_playlist();
 
    url_crid=readCridCookie();
-   
-   if(url_crid){
-    refresh_suggestions(url_crid);
+   if(url_crid && url_crid!="null" && url_crid!=""){
+     window.location.hash="#crid="+url_crid;
+     refresh_suggestions(url_crid);
    }else if(q){
     do_search(q);
    }else if(term){
