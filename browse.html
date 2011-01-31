@@ -227,6 +227,9 @@ function recommendations(result){
           }
 
 
+          if(crid){
+             addCridToCookie(crid);
+          }
 
           var ti = "";
           if(st && st!=""){
@@ -397,6 +400,8 @@ function insert() {
 
    getPlaylist(user_id);
    //show_playlist();
+
+   url_crid=readCridCookie();
    
    if(url_crid){
     refresh_suggestions(url_crid);
@@ -596,9 +601,12 @@ function print_cats(text) {
 
 
 //cookies stuff
+
 //onload check for a specific cookie
 //if not there. generate a random number, create a cookie; display T&Cs
 //else use the one in the cookie
+
+//also when we change crid, puts that in a cookie and remember it for later
 
 function checkCookies(){
   var cookie = readCookie('notube_eval1');
@@ -611,6 +619,17 @@ function checkCookies(){
      user_id = 'nt_user_'+r
      createCookie('notube_eval1',user_id,7)
   }
+}
+
+function readCridCookie(){
+  var cookie = readCookie('notube_last_crid');
+  return cookie;
+}
+
+function addCridToCookie(crid){
+   if(crid && crid!=""){
+     createCookie('notube_last_crid',crid,7)
+   }
 }
 
 function createCookie(name,value,days) {
