@@ -157,6 +157,7 @@ function search_results(ob){
 
 function capitalise(txt){
 
+txt = txt.replace(/:/g," : ");
 var arr = txt.split(/[.|,| |\(|\)|\[|\]]/);
 var arr2 = [];
 //split
@@ -228,13 +229,14 @@ function recommendations(result){
 
 
           var ti = "";
-          if(st){
+          if(st && st!=""){
             st = capitalise(st);
           }                  
 
-          if(ct){
+          if(ct && ct!=""){
             ct = capitalise(ct);
           }
+
           if(st && st!=" " && st!=""){
              ti = st;
              if(ct && ct!=" " && ct!=""){
@@ -300,10 +302,10 @@ function recommendations(result){
                 var pid = suggestions[r]["pid"];
 
 
-                if(st1){
+                if(st1 && st1!=""){
                   st1 = capitalise(st1);
                 }
-                if(ct1){
+                if(ct1 && ct1!=""){
                   ct1 = capitalise(ct1);
                 }
 
@@ -313,11 +315,25 @@ function recommendations(result){
                    s = s+ "<div class=\"rec\"><a href=\"#"+crid1+"\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\"><img src='"+img+"' width='150' border='0'/></a></div>";
                 }
 
+                var ti1;
+                if(st1 && st1!=" " && st1!=""){
+                  ti1 = st1;
+                  if(ct1 && ct1!=" " && ct1!=""){
+                    ti1 = st1+" : "+ct1;
+                  }else{
+                    ti1 = st1;
+                  }
+                }else{
+                  if(ct1 && ct1!=" " && ct1!=""){
+                    ti1 = ct1;
+                  }
+                }
+
 
                 if (st1 && st1!="" && st1!=" "){
-                  s = s+"<div class=\"rectext\"> <b><a href=\"#"+crid1+"\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\">"+st1+": "+ct1+"</a></b>"
+                  s = s+"<div class=\"rectext\"> <b><a href=\"#"+crid1+"\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\">"+ti1+"</a></b>"
                 }else{
-                  s = s+"<div class=\"rectext\"> <b><a href=\"#"+crid1+"\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\">"+ct1+"</a></b>"
+                  s = s+"<div class=\"rectext\"> <b><a href=\"#"+crid1+"\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\">"+ti1+"</a></b>"
                 }
 
                 var playlist = " <big><a href=\"#\" title=\"Add to playlist\" onclick=\"javascript:playlist_add('"+crid1+"');return false;\">[+]</a></big> ";
@@ -363,8 +379,8 @@ function showPlaylistButton(user_id){
 //<button type='button' onclick='javascript:show_playlist();return false;'>Show Playlist</button></span>
   var d = document.getElementById("playlistButton");
   d.innerHTML="<small><a href=\"#\" onclick=\"javascript:show_playlist('"+user_id+"');return false;\">Show Playlist</a></small>";
-  var dx = document.getElementById("playlistButtonXML");
-  dx.innerHTML="<small><a href=\"http://dev.notu.be/2011/01/api/playlist?action=get&user_id="+user_id+"&fmt=xml\" target=\"_blank\">XML</a></small>";
+//  var dx = document.getElementById("playlistButtonXML");
+//  dx.innerHTML="<small><a href=\"http://dev.notu.be/2011/01/api/playlist?action=get&user_id="+user_id+"&fmt=xml\" target=\"_blank\">XML</a></small>";
 
 }
 
@@ -463,8 +479,9 @@ function playlist_get_process(result){
                 s = s+ "</div></div>\n";
 
               }//end for
-            }//end if
-                 
+            }else{
+              s="<p>Nothing on your playlist yet - you can add items using the [+] button next to the titles of programmes.</p><p>Click anywhere outside this box to close it.</p>"
+            }//end if suggestions
 
   var a = document.getElementById("playlistget");
   a.innerHTML=s;
@@ -665,7 +682,8 @@ function send_email(){
     <span class="form" id="playlistButton"></span>
     <span class="playlistXML" id="playlistButtonXML"></span>
 <!--<button type='button' onclick='javascript:show_playlist();return false;'>Show Playlist</button></span>-->
-    <span class="random" id="random"><small><a href="#" onclick='javascript:do_random();return false;'>shuffle!</a></small></span>
+    <span class="random" id="random"><small><a href="#" onclick='javascript:do_random();return false;'>Shuffle!</a></small></span>
+    <span class="help" id="help"><a href="help.html" target="_blank">Help</a></span>
 
   </div>
   <div id="wrapper">

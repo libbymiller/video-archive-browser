@@ -62,8 +62,12 @@ input.abutton
 #header span.random{
   position: absolute; right: 400px;
 }
+
 #header span.playlistXML{
   position: absolute; right: 105px;
+}
+#header span.help{
+  position: absolute; right: 50px;
 }
 
 
@@ -118,7 +122,7 @@ li{
 	border:0;
 #	height: 200px;
 	color: #58626c;
-	border-bottom: solid #bbb 1px;
+#	border-bottom: solid #bbb 1px;
 }
 
 div.rec{
