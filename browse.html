@@ -80,11 +80,11 @@ var start_url="http://dev.notu.be/2011/01/api/random?fmt=json";
 var checked = false;
 var user_id="unknown";
 
-function insert2(script) {
+function insert2(sc) {
    var headID = document.getElementsByTagName("head")[0];
    var newScript = document.createElement('script');
    newScript.type = 'text/javascript';
-   newScript.src = script;
+   newScript.src = sc;
    headID.appendChild(newScript);
 }
 
@@ -367,13 +367,12 @@ function programme(thing){
 
 }
 
-var script = start_url;
 
 function do_random(){
     var headID = document.getElementsByTagName("head")[0];
     var newScript = document.createElement('script');
     newScript.type = 'text/javascript';
-    newScript.src = script;
+    newScript.src = start_url+"&user_id="+user_id;
     headID.appendChild(newScript); 
 }
 
@@ -413,7 +412,7 @@ function insert() {
     var headID = document.getElementsByTagName("head")[0];
     var newScript = document.createElement('script');
     newScript.type = 'text/javascript';
-    newScript.src = script;
+    newScript.src = start_url+"&user_id="+user_id;
     headID.appendChild(newScript);
    }
 }
