@@ -690,8 +690,29 @@ function playlist_delete(crid){
 
 
 function send_email(){
- alert("email sent!");
- $("#TandCs").data("overlay").close();
+  var email = document.forms[0].email.value;
+  var cb = document.forms[0].agree.checked;
+//alert(email+" "+cb+" "+user_id);
+
+  if(email && cb && user_id){
+    var headID = document.getElementsByTagName("head")[0];
+    var newScript = document.createElement('script');
+    newScript.type = 'text/javascript';
+    newScript.src = "http://dev.notu.be/2011/01/api/email?email="+email+"&user_id="+user_id;
+    headID.appendChild(newScript);
+
+// alert("email sent!");
+    $("#TandCs").data("overlay").close();
+  }else{
+    var z = document.getElementById("err");
+    z.innerHTML="<font color='red'>Please add your email and check the box</font><br />";
+    return false;
+  }
+}
+
+//result of email script
+function result(ob){
+  //alert(ob["result"]["message"]);
 }
 
 </script>
@@ -764,6 +785,7 @@ varius hendrerit vitae eget massa. Phasellus euismod erat sed nibh elementum ac 
 Phasellus sed quam sed orci feugiat sagittis. Sed velit dolor, scelerisque id interdum quis, tempus sed metus.
 </p>
 <form onsubmit="javascript:send_email();return false;">
+<span id="err"></span>
 Your email: <input type="text" name="email" value=""/><br />
 I agree to the terms and conditions: <input type="checkbox" name="agree" value=""/><br />
 <input type="submit" name="go" value="Send email and continue" />
