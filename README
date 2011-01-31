@@ -1,2 +1,5 @@
 A browser for serendipitous discovery of interesting video content, hopefully.
 
+Needs jquery and jquery.tools and jquery.ba-hashchange.js in the /lib directory.
+
+Thanks to Michael Sparks for the channel idents.
