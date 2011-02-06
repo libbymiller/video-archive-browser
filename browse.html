@@ -19,14 +19,14 @@
 <script type="text/javascript">
 
 //variables after #
-var url_crid=null;
+var url_pid=null;
 var q=null;
 var term=null;
 var pr = window.location.hash;
 //alert(pr);
 if(pr){   
-  if(pr.match("crid://")){
-    url_crid=pr.substring(1);
+  if(pr.match("pid")){
+    url_pid=pr.substring(5);
   }
   if(pr.match("q=")){
     q=pr.substring(3);
@@ -44,11 +44,11 @@ $(function(){
     // Alerts every time the hash changes!
    var pr = location.hash;
    if(pr){   
-     if(pr.match("crid://")){
-       url_crid=pr.substring(1);
-       if(url_crid){
-//alert(url_crid);
-        refresh_suggestions(url_crid);
+     if(pr.match("pid")){
+       url_pid=pr.substring(5);
+       if(url_pid){
+//alert(url_pid);
+        refresh_suggestions(url_pid);
        }
      }
      if(pr.match("q=")){
@@ -60,7 +60,7 @@ $(function(){
      if(pr.match("term=")){
        term=pr.substring(6);
        if(term){
-         do_cat_search(term);
+         //do_cat_search(term);
        }
      }
 
@@ -74,6 +74,7 @@ $(function(){
 
 var playlist_changed=false;
 var search_url = "http://dev.notu.be/2011/01/api/search"
+var series_url = "http://dev.notu.be/2011/01/api/series"
 var suggest_url = "http://dev.notu.be/2011/01/api/suggest";
 var start_url="http://dev.notu.be/2011/01/api/random?fmt=json";
 
@@ -97,9 +98,15 @@ function do_search(txt){
 
 
 function do_cat_search(txt){
-///alert(search_url+"?cat="+txt+"&fmt=json ,,,,");
+//alert(search_url+"?cat="+txt+"&fmt=json ,,,,");
    window.location.hash="#term="+txt;
    insert2(search_url+"?cat="+txt+"&fmt=json&user_id="+user_id);
+}
+
+function do_series_search(txt){
+//alert(series_url+"?crid="+txt+"&fmt=json ,,,,");
+   window.location.hash="#series="+txt;
+   insert2(series_url+"?crid="+txt+"&fmt=json&user_id="+user_id);
 }
 
 
@@ -108,19 +115,31 @@ function search_results(ob){
 //alert(ob.length)
 
   var html = "<h3>Programmes about ";
-  if(ob.length==1){
-    var t = ob[0]["term"];
-    var tn = ob[0]["term_name"];
-    html=tn+"</h3>\n<ul><li>Sorry, nothing found</li>\n";
-    suggest1(html)//fix!
-    r.innerHTML=html;
+  if(ob.length==0){
+    if(ob[0]["categories"]){
+      var t = ob[0]["categories"][0]["term"];
+      var tn = ob[0]["categories"][0]["term_name"];
+    }
+    html=tn+"</h3>\n<p>Sorry, nothing found</p>\n";
+
+    document.getElementById("cat_search");
+    cat_search.innerHTML=html;
+    show_cat_search();
+
   }else{
-     var t = ob[0]["term"];
-     var tn = ob[0]["term_name"];
-     html=html+""+tn+"</h3>\n<ul>\n";
-     for (var i=1; i<ob.length; i++){
+     if(ob[0]["categories"]){
+       var t = ob[0]["categories"][0]["term"];
+       var tn = ob[0]["categories"][0]["term_name"];
+     }else{
+        var tn = ob[0]["series_title"];
+     }
+
+     html=html+""+tn+"</h3>\n";
+     for (var i=0; i<ob.length; i++){
         var cct = ob[i]["core_title"];
         var sst = ob[i]["series_title"];
+        var desc = ob[i]["description"];
+        var image = ob[i]["image"];
 
         if(sst){
           sst = capitalise(sst);
@@ -143,11 +162,14 @@ function search_results(ob){
            }
         }
 
-        html = html+"<li><b><a href=\"#"+ob[i]["crid"]+"\" onclick=\"javascript:refresh_suggestions('"+ob[i]["crid"]+"')\">"+fulltitle+"</a></b><p>"+ob[i]["text_date"]+" on "+ob[i]["channel"]+"</p></li>\n"
+        html = html+"<div class=\"rec\"><a href=\"#pid="+ob[i]["pid"]+"\" onclick=\"javascript:refresh_suggestions('"+ob[i]["pid"]+"')\">\n"+
+"<img src=\""+image+"\" width=\"150\" border=\"0\" /></a></div><div class=\"rectext\"> \n<b>"+
+"<a href=\"#pid="+ob[i]["pid"]+"\" onclick=\"javascript:refresh_suggestions('"+ob[i]["pid"]+"')\">"+fulltitle+"</a></b>\n"+
+"<big><a href=\"#\" title=\"Add to playlist\" onclick=\"javascript:playlist_add('"+ob[i]["pid"]+"');return false;\">[+]</a></big>\n"+
+"<br /><small>"+ob[i]["text_date"]+" "+ob[i]["channel"]+"</small><p>"+ob[i]["description"]+"</p></div>\n";
+
 
      }
-     html = html+"</ul>";
-//   suggest1(html);
      document.getElementById("cat_search");
      cat_search.innerHTML=html;
      show_cat_search();
@@ -178,14 +200,13 @@ function recommendations(result){
           var st = result["series_title"];
           var img = result["image"];
           var suggestions = result["suggestions"];
-          var crid = result["crid"];
           var pid = result["pid"];
           var ddtt = result["date_time"];
           var text_date = result["text_date"];
           var channel = result["channel"];
           var description = result["description"];
           var catz = result["categories"];
-        
+          var series = result["series"];
 
           if(catz){
              var cats ="";
@@ -202,6 +223,11 @@ function recommendations(result){
                cats = "<span class='cat'><b>More programmes about:</b> "+cats+"</span>";
                print_cats(cats);
              } 
+          }
+
+
+          if(series && series!=""){
+              description = description+"<br /><br /><a href=\"#series="+series+"\" onclick=\"javascript:do_series_search('"+escape(series)+"');return false;\">More from this series</a><br /> ";        
           }
 
           if(pid){
@@ -227,8 +253,8 @@ function recommendations(result){
           }
 
 
-          if(crid){
-             addCridToCookie(crid);
+          if(pid){
+             addPidToCookie(pid);
           }
 
           var ti = "";
@@ -253,8 +279,8 @@ function recommendations(result){
              }
           }
 
-          var playlist = " <big><a href=\"#\" title=\"Add to playlist\" onclick=\"javascript:playlist_add('"+crid+"');return false;\">[+]</a></big> ";
-          if(crid){
+          var playlist = " <big><a href=\"#\" title=\"Add to playlist\" onclick=\"javascript:playlist_add('"+pid+"');return false;\">[+]</a></big> ";
+          if(pid){
             ti = ti+""+playlist;
           }
 
@@ -266,7 +292,6 @@ function recommendations(result){
           }else{
             s = "<h3 style='padding-left:8px'>Random Selection</h3>";
             term_term="More programmes about";
-
           }
           var s1 ="";
           var s2 ="";
@@ -295,14 +320,12 @@ function recommendations(result){
                 }
                 var st1 = suggestions[r]["series_title"];
                 var ct1 = suggestions[r]["core_title"];
-                var crid1 = suggestions[r]["crid"];
                 var desc = suggestions[r]["description"];
-                var ppid = suggestions[r]["pid"];
+                var pid1 = suggestions[r]["pid"];
                 var img = suggestions[r]["image"];
                 var pn1 = suggestions[r]["programme_number"];
                 var ddtt = suggestions[r]["date_time"];
                 var text_date = suggestions[r]["text_date"];
-                var pid = suggestions[r]["pid"];
 
 
                 if(st1 && st1!=""){
@@ -315,7 +338,7 @@ function recommendations(result){
 
                 if(img){
 
-                   s = s+ "<div class=\"rec\"><a href=\"#"+crid1+"\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\"><img src='"+img+"' width='150' border='0'/></a></div>";
+                   s = s+ "<div class=\"rec\"><a href=\"#pid="+pid1+"\" onclick=\"javascript:refresh_suggestions('"+pid1+"')\"><img src='"+img+"' width='150' border='0'/></a></div>";
                 }
 
                 var ti1;
@@ -334,13 +357,13 @@ function recommendations(result){
 
 
                 if (st1 && st1!="" && st1!=" "){
-                  s = s+"<div class=\"rectext\"> <b><a href=\"#"+crid1+"\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\">"+ti1+"</a></b>"
+                  s = s+"<div class=\"rectext\"> <b><a href=\"#pid="+pid1+"\" onclick=\"javascript:refresh_suggestions('"+pid1+"')\">"+ti1+"</a></b>"
                 }else{
-                  s = s+"<div class=\"rectext\"> <b><a href=\"#"+crid1+"\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\">"+ti1+"</a></b>"
+                  s = s+"<div class=\"rectext\"> <b><a href=\"#pid="+pid1+"\" onclick=\"javascript:refresh_suggestions('"+pid1+"')\">"+ti1+"</a></b>"
                 }
 
-                var playlist = " <big><a href=\"#\" title=\"Add to playlist\" onclick=\"javascript:playlist_add('"+crid1+"');return false;\">[+]</a></big> ";
-                if(crid1){
+                var playlist = " <big><a href=\"#\" title=\"Add to playlist\" onclick=\"javascript:playlist_add('"+pid1+"');return false;\">[+]</a></big> ";
+                if(pid1){
                   s = s+""+playlist;
                 }
 
@@ -396,18 +419,14 @@ function insert() {
 //     alert("ok! "+user_id);
    }
    
-
-   getPlaylist(user_id);
-   //show_playlist();
-
-   url_crid=readCridCookie();
-   if(url_crid && url_crid!="null" && url_crid!=""){
-     window.location.hash="#crid="+url_crid;
-     refresh_suggestions(url_crid);
+   url_pid=readPidCookie();
+   if(url_pid && url_pid!="null" && url_pid!=""){
+     window.location.hash="#pid="+url_pid;
+     refresh_suggestions(url_pid);
    }else if(q){
     do_search(q);
    }else if(term){
-    do_cat_search(term);
+    //do_cat_search(term);
    }else{
     var headID = document.getElementsByTagName("head")[0];
     var newScript = document.createElement('script');
@@ -415,6 +434,8 @@ function insert() {
     newScript.src = start_url+"&user_id="+user_id;
     headID.appendChild(newScript);
    }
+
+   getPlaylist(user_id);
 }
 
 
@@ -442,30 +463,28 @@ function playlist_get_process(result){
             for (r in suggestions){
                 var st1 = suggestions[r]["series_title"];
                 var ct1 = suggestions[r]["core_title"];
-                var crid1 = suggestions[r]["crid"];
                 var desc = suggestions[r]["description"];
-                var ppid = suggestions[r]["pid"];
+                var pid1 = suggestions[r]["pid"];
                 var img = suggestions[r]["image"];
                 var pn1 = suggestions[r]["programme_number"];
                 var ddtt = suggestions[r]["date_time"];
                 var text_date = suggestions[r]["text_date"];
-                var pid = suggestions[r]["pid"];
-                var playlist = " <a href=\"#\" onclick=\"javascript:playlist_delete('"+crid1+"');return false;\">Delete from playlist</a> ";
+                var playlist = " <a href=\"#\" onclick=\"javascript:playlist_delete('"+pid1+"');return false;\">Delete from playlist</a> ";
                 if(st1){
                   st1 = capitalise(st1);
                 }
                 if(ct1){
                   ct1 = capitalise(ct1);
                 }
-                s = s+"<div id=\""+crid1+"\">";
+                s = s+"<div id=\""+pid1+"\">";
 
                 if(img){
                    s = s+ "<div style=\"float:left;padding:10px\"><img src='"+img+"' width='200'/></div>";
                 }
                 if (st1 && st1!="" && st1!=" "){
-                  s = s+"<div style=\"padding:10px\"><b><a href=\"#\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\">"+st1+": "+ct1+"</a></b>"
+                  s = s+"<div style=\"padding:10px\"><b><a href=\"#pid="+pid1+"\" onclick=\"javascript:refresh_suggestions('"+pid1+"')\">"+st1+": "+ct1+"</a></b>"
                 }else{
-                  s = s+"<div style=\"padding:10px\"><b><a href=\"#\" onclick=\"javascript:refresh_suggestions('"+crid1+"')\">"+ct1+"</a></b>"
+                  s = s+"<div style=\"padding:10px\"><b><a href=\"#pid="+pid1+"\" onclick=\"javascript:refresh_suggestions('"+pid1+"')\">"+ct1+"</a></b>"
                 }
 
                 if(desc){
@@ -473,8 +492,8 @@ function playlist_get_process(result){
                    if(text_date){
                      s = s+" From "+text_date;
                    }
-                   if(pid){
-                     s = s+" <br /><a href='http://www.bbc.co.uk/programmes/"+pid+"' target='_blank'>BBC Website</a>";
+                   if(pid1){
+                     s = s+" <br /><a href='http://www.bbc.co.uk/programmes/"+pid1+"' target='_blank'>BBC Website</a>";
                    }
                    s = s+"</p>\n"+playlist;
                 }else{//horrible, sorry!
@@ -540,10 +559,10 @@ function insert_with_src(sc) {
 
 
 //1. just does the suggest thing
-//2. that looks up the infax / crid on progs and finds the image
+//2. that looks up the infax / pid on progs and finds the image
 //3. finds descriptions for all of them
 
-function refresh_suggestions(crid){
+function refresh_suggestions(pid){
     //close the cat search overlay if it's open
     if($("#cat_search").data("overlay")){
       $("#cat_search").data("overlay").close();
@@ -552,7 +571,7 @@ function refresh_suggestions(crid){
     if($("#playlistget").data("overlay")){
       $("#playlistget").data("overlay").close();
     }
-    var y =suggest_url+"?crid="+crid+"&fmt=json&user_id="+user_id;
+    var y =suggest_url+"?pid="+pid+"&fmt=json&user_id="+user_id;
     //alert(y);
     insert_with_src(y);
 }
@@ -605,7 +624,7 @@ function print_cats(text) {
 //if not there. generate a random number, create a cookie; display T&Cs
 //else use the one in the cookie
 
-//also when we change crid, puts that in a cookie and remember it for later
+//also when we change pid, puts that in a cookie and remember it for later
 
 function checkCookies(){
   var cookie = readCookie('notube_eval1');
@@ -620,14 +639,14 @@ function checkCookies(){
   }
 }
 
-function readCridCookie(){
-  var cookie = readCookie('notube_last_crid');
+function readPidCookie(){
+  var cookie = readCookie('notube_last_pid');
   return cookie;
 }
 
-function addCridToCookie(crid){
-   if(crid && crid!=""){
-     createCookie('notube_last_crid',crid,7)
+function addPidToCookie(pid){
+   if(pid && pid!=""){
+     createCookie('notube_last_pid',pid,7)
    }
 }
 
@@ -658,9 +677,9 @@ function eraseCookie(name) {
 
 //playlist stuff
 
-function playlist_add(crid){
+function playlist_add(pid){
    playlist_changed=true;
-   var u = "http://dev.notu.be/2011/01/api/playlist?action=add&user_id="+user_id+"&crid="+crid+"&fmt=json";
+   var u = "http://dev.notu.be/2011/01/api/playlist?action=add&user_id="+user_id+"&pid="+pid+"&fmt=json";
 
    var headID = document.getElementsByTagName("head")[0];
    var newScript = document.createElement('script');
@@ -670,12 +689,12 @@ function playlist_add(crid){
 
 }
 
-function playlist_delete(crid){
+function playlist_delete(pid){
    playlist_changed=true;
-//alert("http://dev.notu.be/2011/01/api/playlist?action=delete&user_id="+user_id+"&crid="+crid+"&fmt=json");
-   document.getElementById(crid).style.display = 'none';
+//alert("http://dev.notu.be/2011/01/api/playlist?action=delete&user_id="+user_id+"&pid="+pid+"&fmt=json");
+   document.getElementById(pid).style.display = 'none';
 
-   var u = "http://dev.notu.be/2011/01/api/playlist?action=delete&user_id="+user_id+"&crid="+crid+"&fmt=json";
+   var u = "http://dev.notu.be/2011/01/api/playlist?action=delete&user_id="+user_id+"&pid="+pid+"&fmt=json";
    var headID = document.getElementsByTagName("head")[0];
    var newScript = document.createElement('script');
    newScript.type = 'text/javascript';
