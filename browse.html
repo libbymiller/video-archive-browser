@@ -92,20 +92,20 @@ function insert2(sc) {
 
 function do_search(txt){
 //alert(search_url+"?q="+txt+"&fmt=json ....");
-   window.location.hash="#q="+escape(txt);
+//   window.location.hash="#q="+escape(txt);
    insert2(search_url+"?q="+escape(txt)+"&fmt=json&user_id="+user_id);
 }
 
 
 function do_cat_search(txt){
 //alert(search_url+"?cat="+txt+"&fmt=json ,,,,");
-   window.location.hash="#term="+txt;
+//   window.location.hash="#term="+txt;
    insert2(search_url+"?cat="+txt+"&fmt=json&user_id="+user_id);
 }
 
 function do_series_search(txt){
 //alert(series_url+"?crid="+txt+"&fmt=json ,,,,");
-   window.location.hash="#series="+txt;
+//   window.location.hash="#series="+txt;
    insert2(series_url+"?crid="+txt+"&fmt=json&user_id="+user_id);
 }
 
