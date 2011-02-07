@@ -495,6 +495,14 @@ function playlist_get_process(result){
                 var pn1 = suggestions[r]["programme_number"];
                 var ddtt = suggestions[r]["date_time"];
                 var text_date = suggestions[r]["text_date"];
+                var channel = suggestions[r]["channel"];
+
+                var dx = ddtt.replace("T","/");
+                dx = dx.replace(/\+\d\d:\d\d/,"");
+                dx = dx.replace(/:/g,"-");
+
+                var r_url ="http://g.bbcredux.com/programme/"+channel+"/"+dx+"/";
+
                 var playlist = " <a href=\"#\" onclick=\"javascript:playlist_delete('"+pid1+"');return false;\">Delete from playlist</a> ";
                 if(st1){
                   st1 = capitalise(st1);
@@ -518,9 +526,14 @@ function playlist_get_process(result){
                    if(text_date){
                      s = s+" From "+text_date;
                    }
+
                    if(pid1){
                      s = s+" <br /><a href='http://www.bbc.co.uk/programmes/"+pid1+"' target='_blank'>BBC Website</a>";
                    }
+                   if(r_url){
+                     s = s+" <a href='"+r_url+"' target='_blank'>Play</a>";
+                   }
+
                    s = s+"</p>\n"+playlist;
                 }else{//horrible, sorry!
                   s = s+"<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>\n"+playlist;
