@@ -7,6 +7,13 @@
   <script src="lib/jquery.tools.min.js"></script>
   <script src="lib/jquery.ba-hashchange.js"></script>
 
+  <script id="playlist_script"></script>
+  <script id="email_script"></script>
+  <script id="search_script"></script>
+  <script id="cat_search_script"></script>
+  <script id="series_script"></script>
+  <script id="random_script"></script>
+  <script id="suggest_script"></script>
 
 <!--<meta name="viewport" content="width=1000" />-->
 
@@ -81,32 +88,37 @@ var start_url="http://dev.notu.be/2011/01/api/random?fmt=json";
 var checked = false;
 var user_id="unknown";
 
-function insert2(sc) {
-   var headID = document.getElementsByTagName("head")[0];
+function insert2(sc,id) {
+//   var headID = document.getElementsByTagName("head")[0];
    var newScript = document.createElement('script');
    newScript.type = 'text/javascript';
    newScript.src = sc;
-   headID.appendChild(newScript);
+   newScript.id = id;
+//   headID.appendChild(newScript);
+
+   var el = document.getElementById(id);
+   el.parentNode.replaceChild(newScript,el);
+
 }
 
 
 function do_search(txt){
 //alert(search_url+"?q="+txt+"&fmt=json ....");
 //   window.location.hash="#q="+escape(txt);
-   insert2(search_url+"?q="+escape(txt)+"&fmt=json&user_id="+user_id);
+   insert2(search_url+"?q="+escape(txt)+"&fmt=json&user_id="+user_id,"search_script");
 }
 
 
 function do_cat_search(txt){
 //alert(search_url+"?cat="+txt+"&fmt=json ,,,,");
 //   window.location.hash="#term="+txt;
-   insert2(search_url+"?cat="+txt+"&fmt=json&user_id="+user_id);
+   insert2(search_url+"?cat="+txt+"&fmt=json&user_id="+user_id,"cat_search_script");
 }
 
 function do_series_search(txt){
 //alert(series_url+"?crid="+txt+"&fmt=json ,,,,");
 //   window.location.hash="#series="+txt;
-   insert2(series_url+"?crid="+txt+"&fmt=json&user_id="+user_id);
+   insert2(series_url+"?crid="+txt+"&fmt=json&user_id="+user_id,"series_script");
 }
 
 
@@ -392,11 +404,16 @@ function programme(thing){
 
 
 function do_random(){
-    var headID = document.getElementsByTagName("head")[0];
+    //var headID = document.getElementsByTagName("head")[0];
     var newScript = document.createElement('script');
     newScript.type = 'text/javascript';
     newScript.src = start_url+"&user_id="+user_id;
-    headID.appendChild(newScript); 
+
+    newScript.id = "random_script";
+    //headID.appendChild(newScript); 
+
+    var el = document.getElementById("random_script");
+    el.parentNode.replaceChild(newScript,el);
 }
 
 
@@ -428,11 +445,16 @@ function insert() {
    }else if(term){
     //do_cat_search(term);
    }else{
-    var headID = document.getElementsByTagName("head")[0];
+  //  var headID = document.getElementsByTagName("head")[0];
     var newScript = document.createElement('script');
     newScript.type = 'text/javascript';
     newScript.src = start_url+"&user_id="+user_id;
-    headID.appendChild(newScript);
+    newScript.id = "suggest_script";
+
+  //  headID.appendChild(newScript);
+    var el = document.getElementById("suggest_script");
+    el.parentNode.replaceChild(newScript,el);
+
    }
 
    getPlaylist(user_id);
@@ -445,12 +467,16 @@ function insert() {
 function getPlaylist(user_id){
     var u ="http://dev.notu.be/2011/01/api/playlist?action=get&user_id="+user_id+"&fmt=json";
 //alert(u);
-    var headID = document.getElementsByTagName("head")[0];
+    //var headID = document.getElementsByTagName("head")[0];
     var newScript = document.createElement('script');
     newScript.type = 'text/javascript';
     newScript.src = u;
-    headID.appendChild(newScript); 
+    newScript.id = "playlist_script";
+    //headID.appendChild(newScript); 
     playlist_changed=false;
+    var el = document.getElementById("playlist_script");
+    el.parentNode.replaceChild(newScript,el);
+
 }
 
 function playlist_get_process(result){
@@ -511,6 +537,7 @@ function playlist_get_process(result){
   //make show playlist button visible
   showPlaylistButton(user_id);
 
+
 }
 
 function show_playlist(user_id){
@@ -550,11 +577,16 @@ function show_cat_search(){
 
 
 function insert_with_src(sc) {
-   var headID = document.getElementsByTagName("head")[0];
+//   var headID = document.getElementsByTagName("head")[0];
    var newScript = document.createElement('script');
    newScript.type = 'text/javascript';
    newScript.src = sc;
-   headID.appendChild(newScript);
+   newScript.id = "suggest_script";
+
+//   headID.appendChild(newScript);
+
+   var el = document.getElementById("suggest_script");
+   el.parentNode.replaceChild(newScript,el);
 }
 
 
@@ -680,11 +712,14 @@ function playlist_add(pid){
    playlist_changed=true;
    var u = "http://dev.notu.be/2011/01/api/playlist?action=add&user_id="+user_id+"&pid="+pid+"&fmt=json";
 
-   var headID = document.getElementsByTagName("head")[0];
+//   var headID = document.getElementsByTagName("head")[0];
    var newScript = document.createElement('script');
    newScript.type = 'text/javascript';
    newScript.src = u;
-   headID.appendChild(newScript);
+   newScript.id = "playlist_script";
+//   headID.appendChild(newScript);
+   var el = document.getElementById("playlist_script");
+   el.parentNode.replaceChild(newScript,el);
 
 }
 
@@ -694,11 +729,15 @@ function playlist_delete(pid){
    document.getElementById(pid).style.display = 'none';
 
    var u = "http://dev.notu.be/2011/01/api/playlist?action=delete&user_id="+user_id+"&pid="+pid+"&fmt=json";
-   var headID = document.getElementsByTagName("head")[0];
+ //  var headID = document.getElementsByTagName("head")[0];
    var newScript = document.createElement('script');
    newScript.type = 'text/javascript';
    newScript.src = u;
-   headID.appendChild(newScript);
+   newScript.id = "playlist_script";
+//   headID.appendChild(newScript);
+
+   var el = document.getElementById("playlist_script");
+   el.parentNode.replaceChild(newScript,el);
 
 }
 
@@ -711,11 +750,16 @@ function send_email(){
   var cb = document.forms[0].agree.checked;
 
   if(email && cb && user_id){
-    var headID = document.getElementsByTagName("head")[0];
+    //var headID = document.getElementsByTagName("head")[0];
     var newScript = document.createElement('script');
     newScript.type = 'text/javascript';
     newScript.src = "http://dev.notu.be/2011/01/api/email?email="+email+"&user_id="+user_id;
-    headID.appendChild(newScript);
+    newScript.id = "email_script";
+//    headID.appendChild(newScript);
+
+    var el = document.getElementById("email_script");
+    el.parentNode.replaceChild(newScript,el);
+
 
 // alert("email sent!");
 //create the cookie once consent has been confirmed
