@@ -401,9 +401,9 @@ function do_random(){
 
 
 function showPlaylistButton(user_id){
-//<button type='button' onclick='javascript:show_playlist();return false;'>Show Playlist</button></span>
+//<button type='button' onclick='javascript:show_playlist();return false;'>My Playlist</button></span>
   var d = document.getElementById("playlistButton");
-  d.innerHTML="<small><a href=\"#\" onclick=\"javascript:show_playlist('"+user_id+"');return false;\">Show Playlist</a></small>";
+  d.innerHTML="<small><a href=\"#\" onclick=\"javascript:show_playlist('"+user_id+"');return false;\">My Playlist</a></small>";
 //  var dx = document.getElementById("playlistButtonXML");
 //  dx.innerHTML="<small><a href=\"http://dev.notu.be/2011/01/api/playlist?action=get&user_id="+user_id+"&fmt=xml\" target=\"_blank\">XML</a></small>";
 
@@ -508,7 +508,7 @@ function playlist_get_process(result){
 
   var a = document.getElementById("playlistget");
   a.innerHTML=s;
-  //make show playlist button vsitble
+  //make show playlist button visible
   showPlaylistButton(user_id);
 
 }
@@ -635,7 +635,6 @@ function checkCookies(){
      checked = false;
      var r=Math.floor(Math.random()*10000000);
      user_id = 'nt_user_'+r
-     createCookie('notube_eval1',user_id,7)
   }
 }
 
@@ -710,7 +709,6 @@ function playlist_delete(pid){
 function send_email(){
   var email = document.forms[0].email.value;
   var cb = document.forms[0].agree.checked;
-//alert(email+" "+cb+" "+user_id);
 
   if(email && cb && user_id){
     var headID = document.getElementsByTagName("head")[0];
@@ -720,10 +718,13 @@ function send_email(){
     headID.appendChild(newScript);
 
 // alert("email sent!");
+//create the cookie once consent has been confirmed
+    createCookie('notube_eval1',user_id,7)
+
     $("#TandCs").data("overlay").close();
   }else{
     var z = document.getElementById("err");
-    z.innerHTML="<font color='red'>Please add your email and check the box</font><br />";
+    z.innerHTML="<p><font color='red'>Please add your email and check the box to continue</font></p>";
     return false;
   }
 }
@@ -739,7 +740,6 @@ function result(ob){
     <span class="title">NoTube Archive Browser</span>
     <span class="form" id="playlistButton"></span>
     <span class="playlistXML" id="playlistButtonXML"></span>
-<!--<button type='button' onclick='javascript:show_playlist();return false;'>Show Playlist</button></span>-->
     <span class="random" id="random"><small><a href="#" onclick='javascript:do_random();return false;'>Shuffle!</a></small></span>
     <span class="help" id="help"><a href="help.html" target="_blank">Help</a></span>
 
@@ -793,24 +793,51 @@ Please email us if you come across any bugs or would like to ask us any question
 </div>
 
 <!-- overlays -->
-<div class="simple_overlay" id="TandCs">
-<h3>Hello!</h3>
-<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis pharetra tempus augue, et condimentum sapien 
-imperdiet vitae. Aliquam eget lobortis tellus. Cum sociis natoque penatibus et magnis dis parturient montes,
-nascetur ridiculus mus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae;
-Quisque non diam massa. Sed mollis interdum tempor. Cras ac nibh quis elit rhoncus viverra. Vivamus consectetur
-ipsum vitae diam hendrerit eget tincidunt elit tincidunt. Donec in lorem fermentum tellus pulvinar pulvinar vel
-vitae nulla. In vestibulum blandit lorem, eu lobortis sem vestibulum vitae. Curabitur varius turpis quis dui
-varius hendrerit vitae eget massa. Phasellus euismod erat sed nibh elementum ac suscipit augue bibendum.
-Phasellus sed quam sed orci feugiat sagittis. Sed velit dolor, scelerisque id interdum quis, tempus sed metus.
+<div class="tandc_overlay" id="TandCs">
+<h2>NoTube Archive Browser study consent form</h2>
+<p>
+The BBC (NoTube research project) invites you to participate in a research study relating to a different way of 
+navigating programmes in Redux. The purpose of this study is to determine the effectiveness of this navigation 
+technique.
+</p><p>
+Your involvement in this study will require you to browse a video collection and add programmes of interest to a 
+playlist. You'll be able to browse as often as you like over a period of 7 days. At the end of the trial, you'll 
+be able to keep the playlist and refer back to it (you'll be given a URL).
+</p><p>
+
+Your playlist data will be temporarily linked to your email address. This is because we may invite you to 
+participate in a follow-up study about programme recommendations.
+</p><p>
+
+At the end of the NoTube project in March 2012 we will destroy all identifying data from this experiment.
+</p><p>
+
+In order to take part in the study please read the following statement and check the box if you agree to participate.
+</p><p>
+
+"I freely and voluntarily agree consent to be a participant in the research on the topic of the navigation of 
+large on-demand video collections to be conducted by Libby Miller and Vicky Buser on behalf of the NoTube 
+project. Specifically, I have been asked to take part in a browsing task.
+
+</p><p>
+
+I understand that if at any time during the task I feel unable or unwilling to continue, I am free to leave. 
+That is, my participation in this study is completely voluntary, and I may withdraw from it at any time without 
+negative consequences. In addition, should I not wish to answer any particular question or questions, I am free 
+to decline. My name will not be linked to any research materials, and I will not be identified or identifiable 
+in any report subsequently produced by the BBC or the NoTube project."
+
 </p>
 <form onsubmit="javascript:send_email();return false;">
 <span id="err"></span>
-Your email: <input type="text" name="email" value=""/><br />
-I agree to the terms and conditions: <input type="checkbox" name="agree" value=""/><br />
-<input type="submit" name="go" value="Send email and continue" />
+<p>Your email: <input type="text" name="email" value=""/></p>
+<p>
+I have read and understood the above consent to participate in the study. <br />
+My consent is not a waiver of any legal rights.
+</p>
+ <input type="checkbox" name="agree" value=""/>
+<input type="submit" name="go" value="I give my consent" />
 </form>
-        
 </div>   
 
 </body>
@@ -820,13 +847,13 @@ I agree to the terms and conditions: <input type="checkbox" name="agree" value="
 function popup_starter(){
 
   $("#TandCs").overlay({
-        top: 100,
+        top: 30,
         mask: {
                 color: '#111',
                 loadSpeed: 200,
                 opacity: 0.5
         },
-        closeOnClick: true,
+        closeOnClick: false,
         load: true
   });
 }
