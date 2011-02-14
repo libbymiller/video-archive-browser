@@ -217,9 +217,30 @@ var arr2 = [];
  return arr2.join(" ");
 }
 
+
+function random(result){
+//fix lhs
+  document.getElementById("info").style.display = "block";
+  document.getElementById("title").innerHTML = "<h3>Browse Archive Video</h3>";
+  document.getElementById("telly").style.display = "none";
+  document.getElementById("image").style.display = "none";
+  document.getElementById("pidurl").style.display = "none";
+  document.getElementById("cats").style.display = "none";
+//pass to the usual thing
+  process_json_results(result);
+}
+
 //process the script results
 function recommendations(result){
+  document.getElementById("info").style.display = "none";
+  document.getElementById("image").style.display = "block";
+  document.getElementById("telly").style.display = "block";
+  document.getElementById("pidurl").style.display = "block";
+  document.getElementById("cats").style.display = "block";
+  process_json_results(result);
+}
 
+function process_json_results(result){
           var pn = result["programme_number"];
           var ct = result["core_title"];
           var st = result["series_title"];
@@ -429,7 +450,9 @@ function do_random(){
     //var headID = document.getElementsByTagName("head")[0];
     var newScript = document.createElement('script');
     newScript.type = 'text/javascript';
-    newScript.src = start_url+"&user_id="+user_id;
+
+    var randomnumber=Math.floor(Math.random()*11);
+    newScript.src = start_url+"&user_id="+user_id+"&r="+randomnumber;
 
     newScript.id = "random_script";
     //headID.appendChild(newScript); 
@@ -856,12 +879,14 @@ function result(ob){
 	<div id="container">
 		<div id="side-a">	
                   <h3 id="title">Browse Archive Video</h3>
+
                   <span id="image">
                   </span>
 
-
 <p>
 <div id="telly">
+</div>
+<div id="info">
 <p>
 Thank you for participating in our research.
 </p><p>
