@@ -25,6 +25,8 @@
 <body onload="insert()">
 <script type="text/javascript">
 
+var playlist_pids={};//pids on my playlist
+
 //variables after #
 var url_pid=null;
 var q=null;
@@ -174,10 +176,18 @@ function search_results(ob){
            }
         }
 
+        var pid = ob[i]["pid"];
+
+        if(pid in playlist_pids){
+          var playlist="<small>On playlist</small>";
+        }else{
+          var playlist = " <big><a class=\""+pid+"\" href=\"#\" title=\"Add to playlist\" onclick=\"javascript:playlist_add('"+pid+"');return false;\">[+]</a></big> ";
+        }
+
         html = html+"<div class=\"rec\"><a href=\"#pid="+ob[i]["pid"]+"\" onclick=\"javascript:refresh_suggestions('"+ob[i]["pid"]+"')\">\n"+
 "<img src=\""+image+"\" width=\"150\" border=\"0\" /></a></div><div class=\"rectext\"> \n<b>"+
 "<a href=\"#pid="+ob[i]["pid"]+"\" onclick=\"javascript:refresh_suggestions('"+ob[i]["pid"]+"')\">"+fulltitle+"</a></b>\n"+
-"<big><a class=\""+ob[i]["pid"]+"\" href=\"#\" title=\"Add to playlist\" onclick=\"javascript:playlist_add('"+ob[i]["pid"]+"');return false;\">[+]</a></big>\n"+
+playlist+"\n"+
 "<br /><small>"+ob[i]["text_date"]+" "+ob[i]["channel"]+"</small><p>"+ob[i]["description"]+"</p></div>\n";
 
 
@@ -291,9 +301,13 @@ function recommendations(result){
              }
           }
 
-          var playlist = " <big><a class=\""+pid+"\" href=\"#\" title=\"Add to playlist\" onclick=\"javascript:playlist_add('"+pid+"');return false;\">[+]</a></big> ";
+          if(pid in playlist_pids){
+              var playlist="<small>On playlist</small>";
+          }else{
+              var playlist = " <big><a class=\""+pid+"\" href=\"#\" title=\"Add to playlist\" onclick=\"javascript:playlist_add('"+pid+"');return false;\">[+]</a></big> ";
+          }
           if(pid){
-            ti = ti+""+playlist;
+              ti = ti+""+playlist;
           }
 
           var s="";
@@ -374,7 +388,12 @@ function recommendations(result){
                   s = s+"<div class=\"rectext\"> <b><a href=\"#pid="+pid1+"\" onclick=\"javascript:refresh_suggestions('"+pid1+"')\">"+ti1+"</a></b>"
                 }
 
-                var playlist = " <big><a class=\""+pid1+"\" href=\"#\" title=\"Add to playlist\" onclick=\"javascript:playlist_add('"+pid1+"');return false;\">[+]</a></big> ";
+                if(pid in playlist_pids){
+                  var playlist="<small>On playlist</small>";
+                }else{
+                  var playlist = " <big><a class=\""+pid1+"\" href=\"#\" title=\"Add to playlist\" onclick=\"javascript:playlist_add('"+pid1+"');return false;\">[+]</a></big> ";
+                }
+
                 if(pid1){
                   s = s+""+playlist;
                 }
@@ -482,6 +501,7 @@ function getPlaylist(user_id){
 
 function playlist_get_process(result){
 //somewhere in here look for these pids elsewhere and change the [+] to [on playlist]
+          playlist_pids={};
 
           var suggestions = result["suggestions"];
           var s = "";
@@ -506,10 +526,11 @@ function playlist_get_process(result){
                 var r_url ="http://g.bbcredux.com/programme/"+channel+"/"+dx+"/";
 
                 var playlist = " <a class=\"del_"+pid1+"\" href=\"#\" onclick=\"javascript:playlist_delete('"+pid1+"');return false;\">Delete from playlist</a> ";
-                var playlist1 = "<small><a class=\"del_"+pid1+"\" href=\"#\" onclick=\"javascript:playlist_delete('"+pid1+"');return false;\">On playlist</a></small>";
+                var playlist1 = "<small>On playlist</small>";
 
                 //if we are displaying pids on playlist, change [+]
                 var z = document.getElementsByClassName(pid1);
+                playlist_pids[pid1]=pid1;
 
                 if(z){
                    for (var i = 0; i < z.length; ++i) {
@@ -932,53 +953,6 @@ function popup_starter(){
 }
 
 
-//add to playlist
-/*
-function playlist_add_process(result){
-          var suggestions = result["suggestions"];
-
-          if (suggestions.length>0){
-             var st1 = suggestions[0]["series_title"];
-             var ct1 = suggestions[0]["core_title"];
-             var pid = suggestions[0]["pid"];
-             var ti = st1 +": "+ct1;
-                //if we are displaying pids on playlist, change [+]
-                var z = document.getElementsByClassName(pid);
-                var playlist1 = "<small><a class=\"del_"+pid+"\" href=\"#\" onclick=\"javascript:playlist_delete('"+pid+"');return false;\">On playlist</a></small>";
-                if(z){
-                   for (var i = 0; i < z.length; ++i) {
-                      var el = z.item(i); 
-                      el.innerHTML="<small>"+playlist1+"</small>";
-                   }
-                }
-          }else{
-             var x = document.getElementById("playlistadded");
-             x.innerHTML="Sorry, someting went wrong.";            
-          }
-*/
-/*
-  setTimeout('$("#playlistadded").data("overlay").close();', 1500);
-
-  $("#playlistadded").overlay({
-        top: 100,
-        mask: {
-                color: '#111',
-                loadSpeed: 100,
-                opacity: 0.5
-        },
-        closeOnClick: true,
-        load: false
-  });
-  $("#playlistadded").data("overlay").load();
-*/
-}
-*/
-/*
-//del from playlist
-function playlist_del_process(result){
-//alert("deleting");
-}
-*/
 
 
 </script>
