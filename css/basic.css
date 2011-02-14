@@ -56,26 +56,30 @@ input.abutton
      padding: 0px;
 }
 
-#header span.form{
-  position: absolute; right: 250px;
-  font-size: 16px;
-}
 #header span.random{
   position: absolute; right: 350px;
   font-size: 16px;
 }
 
+#header span.form{
+  position: absolute; right: 260px;
+  font-size: 16px;
+}
 #header span.playlistXML{
   position: absolute; right: 105px;
   font-size: 16px;
 }
-#header span.help{
-  position: absolute; right: 50px;
-  font-size: 16px;
 
+#header span.about{
+  position: absolute; right: 70px;
+  font-size: 12px;
+}
+#header span.help{
+  position: absolute; right: 20px;
+  font-size: 16px;
 }
 #header span.questionnaire{
-  position: absolute; right: 100px;
+  position: absolute; right: 120px;
   font-size: 12px;
 }
 

@@ -138,7 +138,7 @@ function search_results(ob){
 
     document.getElementById("cat_search");
 
-    var closer = "<span class='closeButton'><a href='javascript:close_overlay(\"cat_search\");return false;'>[X]</a></span>\n";
+    var closer = "<span class='closeButton'><a href='javascript:close_overlay(\"cat_search\")'>[X]</a></span>\n";
     cat_search.innerHTML=closer+""+html;
     show_cat_search();
 
@@ -179,23 +179,22 @@ function search_results(ob){
         }
 
         var pid = ob[i]["pid"];
+        var pl = " <big><a class=\""+pid+"\" href=\"#\" title=\"Add to playlist\" onclick=\"javascript:playlist_add('"+pid+"');return false;\">[+]</a></big> ";
 
         if(pid in playlist_pids){
-          var playlist="<small>On playlist</small>";
-        }else{
-          var playlist = " <big><a class=\""+pid+"\" href=\"#\" title=\"Add to playlist\" onclick=\"javascript:playlist_add('"+pid+"');return false;\">[+]</a></big> ";
+          pl=" <small>On playlist</small>";
         }
 
         html = html+"<div class=\"rec\"><a href=\"#pid="+ob[i]["pid"]+"\" onclick=\"javascript:refresh_suggestions('"+ob[i]["pid"]+"')\">\n"+
 "<img src=\""+image+"\" width=\"150\" border=\"0\" /></a></div><div class=\"rectext\"> \n<b>"+
 "<a href=\"#pid="+ob[i]["pid"]+"\" onclick=\"javascript:refresh_suggestions('"+ob[i]["pid"]+"')\">"+fulltitle+"</a></b>\n"+
-playlist+"\n"+
-"<br /><small>"+ob[i]["text_date"]+" "+ob[i]["channel"]+"</small><p>"+ob[i]["description"]+"</p></div>\n";
+pl+"\n"+
+"<br /><small>"+ob[i]["text_date"]+" "+ob[i]["channel"]+"</small><p>"+ob[i]["description"]+"</p></div><div style=\"clear:both;\"></div>\n";
 
 
      }
      document.getElementById("cat_search");
-     var closer = "<span class='closeButton'><a href='javascript:close_overlay(\"cat_search\");return false;'>[X]</a></span>\n";
+     var closer = "<span class='closeButton'><a href='javascript:close_overlay(\"cat_search\")'>[X]</a></span>\n";
      cat_search.innerHTML=closer+""+html;
      show_cat_search();
   }
@@ -325,13 +324,14 @@ function process_json_results(result){
              }
           }
 
+
+          var pl = " <big><a class=\""+pid+"\" href=\"#\" title=\"Add to playlist\" onclick=\"javascript:playlist_add('"+pid+"');return false;\">[+]</a></big> ";
           if(pid in playlist_pids){
-              var playlist="<small>On playlist</small>";
-          }else{
-              var playlist = " <big><a class=\""+pid+"\" href=\"#\" title=\"Add to playlist\" onclick=\"javascript:playlist_add('"+pid+"');return false;\">[+]</a></big> ";
+              pl=" <small>On playlist</small>";
           }
+
           if(pid){
-              ti = ti+""+playlist;
+              ti = ti+""+pl;
           }
 
           var s="";
@@ -412,14 +412,17 @@ function process_json_results(result){
                   s = s+"<div class=\"rectext\"> <b><a href=\"#pid="+pid1+"\" onclick=\"javascript:refresh_suggestions('"+pid1+"')\">"+ti1+"</a></b>"
                 }
 
-                if(pid in playlist_pids){
-                  var playlist="<small>On playlist</small>";
-                }else{
-                  var playlist = " <big><a class=\""+pid1+"\" href=\"#\" title=\"Add to playlist\" onclick=\"javascript:playlist_add('"+pid1+"');return false;\">[+]</a></big> ";
+                var pl = " <big><a class=\""+pid1+"\" href=\"#\" title=\"Add to playlist\" onclick=\"javascript:playlist_add('"+pid1+"');return false;\">[+]</a></big> ";
+                var keys = [];
+                for (var k in playlist_pids)keys.push(k);
+
+                if(playlist_pids && pid1 in playlist_pids){
+//                  pl=" <small>On playlist "+pid1+"... "+keys.join(",")+"</small>";
+                  pl=" <small>On playlist "+pid1+"</small>";
                 }
 
                 if(pid1){
-                  s = s+""+playlist;
+                  s = s+""+pl;
                 }
 
                 if(text_date){
@@ -451,9 +454,8 @@ function do_random(){
     var newScript = document.createElement('script');
     newScript.type = 'text/javascript';
 
-    var randomnumber=Math.floor(Math.random()*11);
+    var randomnumber=Math.floor(Math.random()*20000);
     newScript.src = start_url+"&user_id="+user_id+"&r="+randomnumber;
-
     newScript.id = "random_script";
     //headID.appendChild(newScript); 
 
@@ -513,9 +515,8 @@ function insert() {
 // at any time we need to show it
 // or to filter using it
 function getPlaylist(user_id){
-    var randomnumber=Math.floor(Math.random()*11);
+    var randomnumber=Math.floor(Math.random()*20000);
     var u ="http://dev.notu.be/2011/01/api/playlist?action=get&user_id="+user_id+"&fmt=json&r="+randomnumber;
-//alert(u);
     //var headID = document.getElementsByTagName("head")[0];
     var newScript = document.createElement('script');
     newScript.type = 'text/javascript';
@@ -557,7 +558,7 @@ function playlist_get_process(result){
                 var r_url ="http://g.bbcredux.com/programme/"+channel+"/"+dx+"/";
 
                 var playlist = " <a class=\"del_"+pid1+"\" href=\"#\" onclick=\"javascript:playlist_delete('"+pid1+"');return false;\">Delete from playlist</a> ";
-                var playlist1 = "<small>On playlist</small>";
+                var playlist1 = " <small>On playlist</small>";
 
                 //if we are displaying pids on playlist, change [+]
                 var z = document.getElementsByClassName(pid1);
@@ -604,7 +605,7 @@ function playlist_get_process(result){
                 }else{//horrible, sorry!
                   s = s+"<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>\n"+playlist;
                 }
-                s = s+ "</div></div>\n";
+                s = s+ "</div></div><div style=\"clear:both;\"></div>\n";
 
               }//end for
             }else{
@@ -612,7 +613,7 @@ function playlist_get_process(result){
             }//end if suggestions
 
   var a = document.getElementById("playlistget");
-  a.innerHTML="<span class='closeButton'><a href='javascript:close_overlay(\"playlistget\");return false;'>[X]</a></span><h3>Playlist</h3>\n<p>"+perm+"</p>\n"+s;
+  a.innerHTML="<span class='closeButton'><a href='javascript:close_overlay(\"playlistget\")'>[X]</a></span><h3>Playlist</h3>\n<p>"+perm+"</p>\n"+s;
   //make show playlist button visible
   showPlaylistButton(user_id);
 
@@ -651,6 +652,22 @@ function show_cat_search(){
         load: false
   });
   $("#cat_search").data("overlay").load();
+
+}
+
+
+function show_help(){
+  $("#help_overlay").overlay({
+        top: 100,
+        mask: {
+                color: '#111',
+                loadSpeed: 100,
+                opacity: 0.5
+        },
+        closeOnClick: true,
+        load: false
+  });
+  $("#help_overlay").data("overlay").load();
 
 }
 
@@ -870,9 +887,10 @@ function result(ob){
     <span class="title">NoTube Archive Browser</span>
     <span class="form" id="playlistButton"></span>
     <span class="playlistXML" id="playlistButtonXML"></span>
-    <span class="random" id="random"><small><a href="#" onclick='javascript:do_random();return false;'>Shuffle!</a></small></span>
-    <span class="help" id="help"><a href="help.html" target="_blank">Help</a></span>
+    <span class="random" id="random"><small><a href="#" onclick='javascript:do_random()'>Shuffle!</a></small></span>
+    <span class="help" id="help"><a href="javascript:show_help()">Help</a></span>
     <span class="questionnaire" id="questionnaire"><a href="https://spreadsheets1.google.com/viewform?hl=en&hl=en&formkey=dDlGeWhKT1lGU0JRTGgzY1o0bEYyNFE6MQ#gid=0" target="_blank">Go to questionnaire</a></span>
+    <span class="about" id="about"><a href="help.html" target="_blank">About</a></span>
 
   </div>
   <div id="wrapper">
@@ -1019,6 +1037,18 @@ function popup_starter(){
 <div class="simple_overlay" id="cat_search">
         <!-- the external content is loaded inside this tag -->
         <div class="contentWrap"></div>
+</div>
+
+<div class="simple_overlay" id="help_overlay">
+        <!-- the external content is loaded inside this tag -->
+        <div class="contentWrap">
+          <span class='closeButton'><a href='javascript:close_overlay("help_overlay")'>[X]</a></span>
+<p>
+Please spend as much or as little time as you like over the next seven days to browse through this video collection and add programmes that you'd like to watch to your playlist using the [+] link beside each programme. If you get stuck, click on 'shuffle' to get a new random set of programmes.
+
+You can use this application as many times as you want during the course of the week. You can access the playlist you make until the end of the NoTube project (March 2012). 
+</p>
+        </div>
 </div>
 
 </script>
