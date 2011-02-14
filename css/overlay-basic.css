@@ -87,7 +87,8 @@ div.contentWrap {
 	overflow-y:auto;
 }
 
-/* default close button positioned on upper right corner */
+/* default close button positioned on upper right corner 
+seems very broken so rolling my own
 .simple_overlay .close {
 	background-image:url(../images/close.png);
 	position:absolute; right:5px; top:5px;
@@ -95,3 +96,4 @@ div.contentWrap {
 	height:35px;
 	width:35px;
 }
+*/
