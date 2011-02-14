@@ -15,7 +15,7 @@
   <script id="random_script"></script>
   <script id="suggest_script"></script>
 
-<!--<meta name="viewport" content="width=1000" />-->
+<!--  <meta name="viewport" content="width=980" />-->
 
   <title>Browse Video Archives</title>
 
@@ -177,7 +177,7 @@ function search_results(ob){
         html = html+"<div class=\"rec\"><a href=\"#pid="+ob[i]["pid"]+"\" onclick=\"javascript:refresh_suggestions('"+ob[i]["pid"]+"')\">\n"+
 "<img src=\""+image+"\" width=\"150\" border=\"0\" /></a></div><div class=\"rectext\"> \n<b>"+
 "<a href=\"#pid="+ob[i]["pid"]+"\" onclick=\"javascript:refresh_suggestions('"+ob[i]["pid"]+"')\">"+fulltitle+"</a></b>\n"+
-"<big><a href=\"#\" title=\"Add to playlist\" onclick=\"javascript:playlist_add('"+ob[i]["pid"]+"');return false;\">[+]</a></big>\n"+
+"<big><a class=\""+ob[i]["pid"]+"\" href=\"#\" title=\"Add to playlist\" onclick=\"javascript:playlist_add('"+ob[i]["pid"]+"');return false;\">[+]</a></big>\n"+
 "<br /><small>"+ob[i]["text_date"]+" "+ob[i]["channel"]+"</small><p>"+ob[i]["description"]+"</p></div>\n";
 
 
@@ -291,7 +291,7 @@ function recommendations(result){
              }
           }
 
-          var playlist = " <big><a href=\"#\" title=\"Add to playlist\" onclick=\"javascript:playlist_add('"+pid+"');return false;\">[+]</a></big> ";
+          var playlist = " <big><a class=\""+pid+"\" href=\"#\" title=\"Add to playlist\" onclick=\"javascript:playlist_add('"+pid+"');return false;\">[+]</a></big> ";
           if(pid){
             ti = ti+""+playlist;
           }
@@ -374,7 +374,7 @@ function recommendations(result){
                   s = s+"<div class=\"rectext\"> <b><a href=\"#pid="+pid1+"\" onclick=\"javascript:refresh_suggestions('"+pid1+"')\">"+ti1+"</a></b>"
                 }
 
-                var playlist = " <big><a href=\"#\" title=\"Add to playlist\" onclick=\"javascript:playlist_add('"+pid1+"');return false;\">[+]</a></big> ";
+                var playlist = " <big><a class=\""+pid1+"\" href=\"#\" title=\"Add to playlist\" onclick=\"javascript:playlist_add('"+pid1+"');return false;\">[+]</a></big> ";
                 if(pid1){
                   s = s+""+playlist;
                 }
@@ -465,7 +465,8 @@ function insert() {
 // at any time we need to show it
 // or to filter using it
 function getPlaylist(user_id){
-    var u ="http://dev.notu.be/2011/01/api/playlist?action=get&user_id="+user_id+"&fmt=json";
+    var randomnumber=Math.floor(Math.random()*11);
+    var u ="http://dev.notu.be/2011/01/api/playlist?action=get&user_id="+user_id+"&fmt=json&r="+randomnumber;
 //alert(u);
     //var headID = document.getElementsByTagName("head")[0];
     var newScript = document.createElement('script');
@@ -473,13 +474,14 @@ function getPlaylist(user_id){
     newScript.src = u;
     newScript.id = "playlist_script";
     //headID.appendChild(newScript); 
-    playlist_changed=false;
+    //playlist_changed=false;
     var el = document.getElementById("playlist_script");
     el.parentNode.replaceChild(newScript,el);
 
 }
 
 function playlist_get_process(result){
+//somewhere in here look for these pids elsewhere and change the [+] to [on playlist]
 
           var suggestions = result["suggestions"];
           var s = "";
@@ -503,14 +505,26 @@ function playlist_get_process(result){
 
                 var r_url ="http://g.bbcredux.com/programme/"+channel+"/"+dx+"/";
 
-                var playlist = " <a href=\"#\" onclick=\"javascript:playlist_delete('"+pid1+"');return false;\">Delete from playlist</a> ";
+                var playlist = " <a class=\"del_"+pid1+"\" href=\"#\" onclick=\"javascript:playlist_delete('"+pid1+"');return false;\">Delete from playlist</a> ";
+                var playlist1 = "<small><a class=\"del_"+pid1+"\" href=\"#\" onclick=\"javascript:playlist_delete('"+pid1+"');return false;\">On playlist</a></small>";
+
+                //if we are displaying pids on playlist, change [+]
+                var z = document.getElementsByClassName(pid1);
+
+                if(z){
+                   for (var i = 0; i < z.length; ++i) {
+                      var el = z.item(i); 
+                      el.innerHTML="<small>"+playlist1+"</small>";
+                   }
+                }
+
                 if(st1){
                   st1 = capitalise(st1);
                 }
                 if(ct1){
                   ct1 = capitalise(ct1);
                 }
-                s = s+"<div id=\""+pid1+"\">";
+                s = s+"<div id=\"pl_"+pid1+"\">";
 
                 if(img){
                    s = s+ "<div style=\"float:left;padding:10px\"><img src='"+img+"' width='200'/></div>";
@@ -554,9 +568,9 @@ function playlist_get_process(result){
 }
 
 function show_playlist(user_id){
-  if(playlist_changed){
-    getPlaylist(user_id);
-  }
+  //if(playlist_changed){
+  //  getPlaylist(user_id);
+  //}
 
   $("#playlistget").overlay({
         top: 100,
@@ -722,7 +736,8 @@ function eraseCookie(name) {
 //playlist stuff
 
 function playlist_add(pid){
-   playlist_changed=true;
+//   playlist_changed=true;
+
    var u = "http://dev.notu.be/2011/01/api/playlist?action=add&user_id="+user_id+"&pid="+pid+"&fmt=json";
 
 //   var headID = document.getElementsByTagName("head")[0];
@@ -739,7 +754,7 @@ function playlist_add(pid){
 function playlist_delete(pid){
    playlist_changed=true;
 //alert("http://dev.notu.be/2011/01/api/playlist?action=delete&user_id="+user_id+"&pid="+pid+"&fmt=json");
-   document.getElementById(pid).style.display = 'none';
+   document.getElementById("pl_"+pid).style.display = 'none';
 
    var u = "http://dev.notu.be/2011/01/api/playlist?action=delete&user_id="+user_id+"&pid="+pid+"&fmt=json";
  //  var headID = document.getElementsByTagName("head")[0];
@@ -918,21 +933,30 @@ function popup_starter(){
 
 
 //add to playlist
+/*
 function playlist_add_process(result){
           var suggestions = result["suggestions"];
 
           if (suggestions.length>0){
              var st1 = suggestions[0]["series_title"];
              var ct1 = suggestions[0]["core_title"];
+             var pid = suggestions[0]["pid"];
              var ti = st1 +": "+ct1;
-             var x = document.getElementById("playlistadded");
-             x.innerHTML="Added "+ti+" to your playlist";
+                //if we are displaying pids on playlist, change [+]
+                var z = document.getElementsByClassName(pid);
+                var playlist1 = "<small><a class=\"del_"+pid+"\" href=\"#\" onclick=\"javascript:playlist_delete('"+pid+"');return false;\">On playlist</a></small>";
+                if(z){
+                   for (var i = 0; i < z.length; ++i) {
+                      var el = z.item(i); 
+                      el.innerHTML="<small>"+playlist1+"</small>";
+                   }
+                }
           }else{
              var x = document.getElementById("playlistadded");
              x.innerHTML="Sorry, someting went wrong.";            
           }
-
-
+*/
+/*
   setTimeout('$("#playlistadded").data("overlay").close();', 1500);
 
   $("#playlistadded").overlay({
@@ -946,13 +970,15 @@ function playlist_add_process(result){
         load: false
   });
   $("#playlistadded").data("overlay").load();
+*/
 }
-
+*/
+/*
 //del from playlist
 function playlist_del_process(result){
 //alert("deleting");
 }
-
+*/
 
 
 </script>
