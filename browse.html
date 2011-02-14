@@ -458,7 +458,10 @@ function insert() {
 //     alert("ok! "+user_id);
    }
    
-   url_pid=readPidCookie();
+//check the hash first - shoudl override it
+   if(!url_pid){
+     url_pid=readPidCookie();
+   }
    if(url_pid && url_pid!="null" && url_pid!=""){
      window.location.hash="#pid="+url_pid;
      refresh_suggestions(url_pid);
