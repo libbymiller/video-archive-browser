@@ -117,8 +117,8 @@ a:hover {color:#000}
 
 #suggestions1 { 
 	padding: 0px;
-	float: left;
-	width: 45%;
+#	float: left;
+#	width: 45%;
         background: #fff;
 }
 
@@ -138,6 +138,7 @@ li{
 #	border-bottom: solid #bbb 1px;
 }
 
+
 div.rec{
 float: left; 
 padding-left: 10px;
@@ -145,6 +146,10 @@ padding-right: 10px;
 padding-bottom: 5px;
 }
 div.rectext{
+padding: 5px;
+font-size: 16px;
+}
+div.recdesc{
 padding: 5px;
 font-size: 14px;
 }
@@ -162,4 +167,16 @@ span.closeButton{
 
 #info{
        display: none;
+}
+
+th{
+  text-align:left;
+}
+
+h3{
+  padding:5px;
+}
+
+.center{
+  text-align:center;
 }

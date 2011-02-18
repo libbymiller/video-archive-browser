@@ -23,6 +23,57 @@
 
 
 <body onload="insert()">
+
+<!-- overlays - placed them on top in an attempt to avoid this: http://flowplayer.org/tools/forum/40/53518 -->
+<div class="tandc_overlay" id="TandCs">
+  <h2>NoTube Archive Browser study consent form</h2>
+  <p>
+The BBC (NoTube research project) invites you to participate in a research study relating to a different way of 
+navigating programmes in Redux. The purpose of this study is to determine the effectiveness of this navigation 
+technique.
+  </p>
+  <p>
+Your involvement in this study will require you to browse a video collection and add programmes of interest to a 
+playlist. You'll be able to browse as often as you like over a period of 7 days. At the end of the trial, you'll 
+be able to keep the playlist and refer back to it (you'll be given a URL).
+  </p>
+  <p>
+Your playlist data will be temporarily linked to your email address. This is because we may invite you to 
+participate in a follow-up study about programme recommendations.
+  </p>
+  <p>
+At the end of the NoTube project in March 2012 we will destroy all identifying data from this experiment.
+  </p>
+  <p>
+In order to take part in the study please read the following statement and check the box if you agree to participate.
+  </p>
+  <p>
+"I freely and voluntarily agree consent to be a participant in the research on the topic of the navigation of 
+large on-demand video collections to be conducted by Libby Miller and Vicky Buser on behalf of the NoTube 
+project. Specifically, I have been asked to take part in a browsing task.
+  </p>
+  <p>
+I understand that if at any time during the task I feel unable or unwilling to continue, I am free to leave. 
+That is, my participation in this study is completely voluntary, and I may withdraw from it at any time without 
+negative consequences. In addition, should I not wish to answer any particular question or questions, I am free 
+to decline. My name will not be linked to any research materials, and I will not be identified or identifiable 
+in any report subsequently produced by the BBC or the NoTube project."
+  </p>
+  <form onsubmit="javascript:send_email();return false;">
+    <span id="err"></span>
+    <p>Your email: <input type="text" name="email" value=""/></p>
+    <p>
+    I have read and understood the above consent to participate in the study. <br />
+    My consent is not a waiver of any legal rights.
+   </p>
+   <input type="checkbox" name="agree" value=""/>
+   <input type="submit" name="go" value="I give my consent" />
+  </form>
+</div>   
+
+
+<!--scripts -->
+
 <script type="text/javascript">
 
 var playlist_pids={};//pids on my playlist
@@ -143,6 +194,7 @@ function search_results(ob){
     show_cat_search();
 
   }else{
+     var html="<h3>";
      if(ob[0]["categories"]){
        var t = ob[0]["categories"][0]["term"];
        var tn = ob[0]["categories"][0]["term_name"];
@@ -151,7 +203,10 @@ function search_results(ob){
      }
 
      html=html+""+tn+"</h3>\n";
+     html=html+"\n<table>\n";
      for (var i=0; i<ob.length; i++){
+
+        html=html+"\n<tr><th colspan='2'>\n";
         var cct = ob[i]["core_title"];
         var sst = ob[i]["series_title"];
         var desc = ob[i]["description"];
@@ -181,18 +236,26 @@ function search_results(ob){
         var pid = ob[i]["pid"];
         var pl = " <big><a class=\""+pid+"\" href=\"#\" title=\"Add to playlist\" onclick=\"javascript:playlist_add('"+pid+"');return false;\">[+]</a></big> ";
 
+
         if(pid in playlist_pids){
           pl=" <small>On playlist</small>";
         }
 
-        html = html+"<div class=\"rec\"><a href=\"#pid="+ob[i]["pid"]+"\" onclick=\"javascript:refresh_suggestions('"+ob[i]["pid"]+"')\">\n"+
-"<img src=\""+image+"\" width=\"150\" border=\"0\" /></a></div><div class=\"rectext\"> \n<b>"+
-"<a href=\"#pid="+ob[i]["pid"]+"\" onclick=\"javascript:refresh_suggestions('"+ob[i]["pid"]+"')\">"+fulltitle+"</a></b>\n"+
-pl+"\n"+
-"<br /><small>"+ob[i]["text_date"]+" "+ob[i]["channel"]+"</small><p>"+ob[i]["description"]+"</p></div><div style=\"clear:both;\"></div>\n";
+        html = html+"<div class=\"rectext\"> \n<b><a href=\"#pid="+ob[i]["pid"]+"\" onclick=\"javascript:refresh_suggestions('"+ob[i]["pid"]+"')\">"+fulltitle+"</a></b>\n"+pl+"\n"+
+"<br /><small>"+ob[i]["text_date"]+" "+ob[i]["channel"]+"</small>";
 
+        html=html+"</th></tr>\n<tr><td>\n";
+
+        html = html+"<div class=\"rec\"><a href=\"#pid="+ob[i]["pid"]+"\" onclick=\"javascript:refresh_suggestions('"+ob[i]["pid"]+"')\">\n"+
+"<img src=\""+image+"\" width=\"150\" border=\"0\" /></a></div>";
+
+        html=html+"</td><td>\n";
+
+        html = html+"<div class=\"recdesc\"><p>"+ob[i]["description"]+"</p></div>\n";
+        html=html+"</td></tr>\n"
 
      }
+     html = html+"</table>";
      document.getElementById("cat_search");
      var closer = "<span class='closeButton'><a href='javascript:close_overlay(\"cat_search\")'>[X]</a></span>\n";
      cat_search.innerHTML=closer+""+html;
@@ -280,7 +343,7 @@ function process_json_results(result){
                telly("<p>"+description+"</p>");
             }
             if(img){
-               image("<img src=\""+img+"\" width=\"512\"/>")
+               image("<img src=\""+img+"\" width=\"512\" />")
             }
 
           }else{
@@ -338,16 +401,17 @@ function process_json_results(result){
           var term_term="Related by";
           if(ct || st){
             title(ti);
-            s = "<h3 style='padding-left:8px'>Related Programmes</h3>";
+            s = "<h3 style='padding-left:8px' class='center'>Related Programmes</h3>";
           }else{
-            s = "<h3 style='padding-left:8px'>Random Selection</h3>";
+            s = "<h3 style='padding-left:8px' class='center'>Random Selection</h3>";
             term_term="More programmes about";
           }
           var s1 ="";
           var s2 ="";
+          s=s+"\n<table>\n";
 
           if (suggestions.length>0){
-
+            s = s+"<tr>\n";
             var count = 0;
             var num = suggestions.length/2;
             for (r in suggestions){
@@ -386,11 +450,6 @@ function process_json_results(result){
                 }
 
 
-                if(img){
-
-                   s = s+ "<div class=\"rec\"><a href=\"#pid="+pid1+"\" onclick=\"javascript:refresh_suggestions('"+pid1+"')\"><img src='"+img+"' width='150' border='0'/></a></div>";
-                }
-
                 var ti1;
                 if(st1 && st1!=" " && st1!=""){
                   ti1 = st1;
@@ -405,6 +464,7 @@ function process_json_results(result){
                   }
                 }
 
+                s = s+"<tr><th colspan='2'>";
 
                 if (st1 && st1!="" && st1!=" "){
                   s = s+"<div class=\"rectext\"> <b><a href=\"#pid="+pid1+"\" onclick=\"javascript:refresh_suggestions('"+pid1+"')\">"+ti1+"</a></b>"
@@ -412,32 +472,46 @@ function process_json_results(result){
                   s = s+"<div class=\"rectext\"> <b><a href=\"#pid="+pid1+"\" onclick=\"javascript:refresh_suggestions('"+pid1+"')\">"+ti1+"</a></b>"
                 }
 
+
                 var pl = " <big><a class=\""+pid1+"\" href=\"#\" title=\"Add to playlist\" onclick=\"javascript:playlist_add('"+pid1+"');return false;\">[+]</a></big> ";
                 var keys = [];
                 for (var k in playlist_pids)keys.push(k);
 
                 if(playlist_pids && pid1 in playlist_pids){
 //                  pl=" <small>On playlist "+pid1+"... "+keys.join(",")+"</small>";
-                  pl=" <small>On playlist "+pid1+"</small>";
+                  pl=" <small>On playlist</small>";
                 }
 
                 if(pid1){
                   s = s+""+pl;
                 }
 
+
                 if(text_date){
                    s = s+"<br /><small>"+text_date+"</small><br />";
                 }
+
+                s = s+"</th></tr>\n<tr><td>\n";
+                
+                if(img){
+                   s = s+ "<div class=\"rec\"><a href=\"#pid="+pid1+"\" onclick=\"javascript:refresh_suggestions('"+pid1+"')\"><img src='"+img+"' width='150' border='0'/></a></div>";
+                }
+
+
+                s = s+"</td>\n<td><div class=\"recdesc\">\n";
+
                 if(desc){
                    s = s+""+desc;
                 }
                 if(cats && cats!=""){
                   s = s+ "<br /><span class=\"cat\">"+term_term+": "+cats+"</span>\n";
                 }
-                s = s+ "</div><div style=\"clear:both;\"></div>\n";
+//                s = s+ "</div><div style=\"clear:both;\"></div>\n";
+                s = s+"</div></td></tr>\n";
             }
           
-            s = s + "</div>";
+            s = s+"</table>\n";
+//            s = s + "</div>";
             suggest1(s);
           }
 }
@@ -536,11 +610,12 @@ function playlist_get_process(result){
           playlist_pids={};
 
           var suggestions = result["suggestions"];
-          var s = "";
+          var s = "<table>";
           if (suggestions.length>0){
           
             var num = suggestions.length/2;
             for (r in suggestions){
+                s = s+"<tr><th colspan='2'>";
                 var st1 = suggestions[r]["series_title"];
                 var ct1 = suggestions[r]["core_title"];
                 var desc = suggestions[r]["description"];
@@ -579,15 +654,19 @@ function playlist_get_process(result){
                 }
                 s = s+"<div id=\"pl_"+pid1+"\">";
 
-                if(img){
-                   s = s+ "<div style=\"float:left;padding:10px\"><img src='"+img+"' width='200'/></div>";
-                }
                 if (st1 && st1!="" && st1!=" "){
                   s = s+"<div style=\"padding:10px\"><b><a href=\"#pid="+pid1+"\" onclick=\"javascript:refresh_suggestions('"+pid1+"')\">"+st1+": "+ct1+"</a></b>"
                 }else{
                   s = s+"<div style=\"padding:10px\"><b><a href=\"#pid="+pid1+"\" onclick=\"javascript:refresh_suggestions('"+pid1+"')\">"+ct1+"</a></b>"
                 }
 
+                s = s+"</td></tr>\n<tr><td>";
+
+                if(img){
+                   s = s+ "<div style=\"float:left;padding:10px\"><img src='"+img+"' width='200'/></div>";
+                }
+
+                s = s+"</td>\n<td>";
                 if(desc){
                    s = s+"<p>"+desc;
                    if(text_date){
@@ -605,15 +684,18 @@ function playlist_get_process(result){
                 }else{//horrible, sorry!
                   s = s+"<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>\n"+playlist;
                 }
-                s = s+ "</div></div><div style=\"clear:both;\"></div>\n";
+//                s = s+ "</div></div><div style=\"clear:both;\"></div>\n";
+                s = s+"</td></tr>\n";
 
               }//end for
             }else{
               s="<p>Nothing on your playlist yet - you can add items using the [+] button next to the titles of programmes.</p><p>Click on the close botton on the top right, or anywhere outside this box to close it.</p>"
             }//end if suggestions
 
+  s = s+"</table";
+
   var a = document.getElementById("playlistget");
-  a.innerHTML="<span class='closeButton'><a href='javascript:close_overlay(\"playlistget\")'>[X]</a></span><h3>Playlist</h3>\n<p>"+perm+"</p>\n"+s;
+  a.innerHTML="<span class='closeButton'><a href='javascript:close_overlay(\"playlistget\")'>[X]</a></span><h3>Playlist <small style='position: absolute; right: 105px;'>"+perm+"</small></h3>\n"+s;
   //make show playlist button visible
   showPlaylistButton(user_id);
 
@@ -889,107 +971,51 @@ function result(ob){
     <span class="playlistXML" id="playlistButtonXML"></span>
     <span class="random" id="random"><small><a href="#" onclick='javascript:do_random()'>Shuffle!</a></small></span>
     <span class="help" id="help"><a href="javascript:show_help()">Help</a></span>
-    <span class="questionnaire" id="questionnaire"><a href="https://spreadsheets1.google.com/viewform?hl=en&hl=en&formkey=dDlGeWhKT1lGU0JRTGgzY1o0bEYyNFE6MQ#gid=0" target="_blank">Go to questionnaire</a></span>
+<!--    <span class="questionnaire" id="questionnaire"><a href="https://spreadsheets1.google.com/viewform?hl=en&hl=en&formkey=dDlGeWhKT1lGU0JRTGgzY1o0bEYyNFE6MQ#gid=0" target="_blank">Go to questionnaire</a></span>-->
     <span class="about" id="about"><a href="help.html" target="_blank">About</a></span>
 
   </div>
-  <div id="wrapper">
-	<div id="container">
-		<div id="side-a">	
-                  <h3 id="title">Browse Archive Video</h3>
 
-                  <span id="image">
-                  </span>
-
-<p>
-<div id="telly">
-</div>
-<div id="info">
-<p>
-Thank you for participating in our research.
-</p><p>
-
+  <table>
+   <tr>
+    <td valign="top" width="50%">
+        <div id="#side-a">
+          <h3 id="title" class="center">Browse Archive Video</h3>
+          <div id="image" class="center"><!--main left hand large image goes here--></div>
+          <p>
+          <div id="telly"><!-- main left description goes here--></div>
+          <div id="info"><!-- this is hidden once the user starts to click unless random is hit-->
+            <p>Thank you for participating in our research.</p>
+            <p>
 Start by selecting a programme from the randomly generated list on the right. Spend as much or as little time as 
 you like over the next seven days to browse through this video collection and add programmes that you'd like to 
 watch to your playlist using the <big>[+]</big> link beside each programme. If you get stuck, click on 'shuffle' 
 to get a new random set of programmes.
-
-</p><p>
-
+            </p>
+            <p>
 You can use this application as many times as you want during the course of the week. You can 
 access the playlist you make until the end of the NoTube project (March 2012). See the <a 
 href="help.html"target="_blank">help</a> for more information about how you can use the playlist.
-</p><p>
+            </p>
+            <p>
 Please email us if you come across any bugs or would like to ask us any questions.
-</p>
-</div>
-<span id="pidurl"></span>
-<br />
-<span id="cats"></span>
-</p>
-                </div>
-                   
- 
-                      
-                <span id="suggestions1"></span>
-<!-- for long descriptions-->
-<div id="telly2"></div>
-
-
-  </div>
-</div>
+            </p>
+          </div>
+          <span id="pidurl"></span><!--programmes url-->
+          <br />
+          <span id="cats"><!-- space for categories--></span>
+        </div>
+    </td>
+    <td valign="top">
+      <span id="suggestions1"></span>
+    </td>
+  </tr>
+</table>
 <br />
 <div id="footer">
-<small><span id="out"></span></small>
+<small><span id="out"></span></small><!-- errors-->
 </div>
 
-<!-- overlays -->
-<div class="tandc_overlay" id="TandCs">
-<h2>NoTube Archive Browser study consent form</h2>
-<p>
-The BBC (NoTube research project) invites you to participate in a research study relating to a different way of 
-navigating programmes in Redux. The purpose of this study is to determine the effectiveness of this navigation 
-technique.
-</p><p>
-Your involvement in this study will require you to browse a video collection and add programmes of interest to a 
-playlist. You'll be able to browse as often as you like over a period of 7 days. At the end of the trial, you'll 
-be able to keep the playlist and refer back to it (you'll be given a URL).
-</p><p>
-
-Your playlist data will be temporarily linked to your email address. This is because we may invite you to 
-participate in a follow-up study about programme recommendations.
-</p><p>
-
-At the end of the NoTube project in March 2012 we will destroy all identifying data from this experiment.
-</p><p>
-
-In order to take part in the study please read the following statement and check the box if you agree to participate.
-</p><p>
-
-"I freely and voluntarily agree consent to be a participant in the research on the topic of the navigation of 
-large on-demand video collections to be conducted by Libby Miller and Vicky Buser on behalf of the NoTube 
-project. Specifically, I have been asked to take part in a browsing task.
-
-</p><p>
-
-I understand that if at any time during the task I feel unable or unwilling to continue, I am free to leave. 
-That is, my participation in this study is completely voluntary, and I may withdraw from it at any time without 
-negative consequences. In addition, should I not wish to answer any particular question or questions, I am free 
-to decline. My name will not be linked to any research materials, and I will not be identified or identifiable 
-in any report subsequently produced by the BBC or the NoTube project."
-
-</p>
-<form onsubmit="javascript:send_email();return false;">
-<span id="err"></span>
-<p>Your email: <input type="text" name="email" value=""/></p>
-<p>
-I have read and understood the above consent to participate in the study. <br />
-My consent is not a waiver of any legal rights.
-</p>
- <input type="checkbox" name="agree" value=""/>
-<input type="submit" name="go" value="I give my consent" />
-</form>
-</div>   
 
 </body>
 
