@@ -1,3 +1,4 @@
+<!DOCTYPE HTML>
 <html>
  <head>
   <meta http-equiv=" Content-Type" content="text/html;charset=UTF-8">
@@ -187,7 +188,7 @@ function search_results(ob){
     }
     html=tn+"</h3>\n<p>Sorry, nothing found</p>\n";
 
-    document.getElementById("cat_search");
+    cat_search=document.getElementById("cat_search");
 
     var closer = "<span class='closeButton'><a href='javascript:close_overlay(\"cat_search\")'>[X]</a></span>\n";
     cat_search.innerHTML=closer+""+html;
@@ -256,7 +257,7 @@ function search_results(ob){
 
      }
      html = html+"</table>";
-     document.getElementById("cat_search");
+     var cat_search=document.getElementById("cat_search");
      var closer = "<span class='closeButton'><a href='javascript:close_overlay(\"cat_search\")'>[X]</a></span>\n";
      cat_search.innerHTML=closer+""+html;
      show_cat_search();
@@ -589,7 +590,8 @@ function insert() {
 // at any time we need to show it
 // or to filter using it
 function getPlaylist(user_id){
-    var randomnumber=Math.floor(Math.random()*20000);
+    var randomnumber=Math.random()*20000;
+//    var randomnumber=Math.floor(Math.random()*20000);
     var u ="http://dev.notu.be/2011/01/api/playlist?action=get&user_id="+user_id+"&fmt=json&r="+randomnumber;
     //var headID = document.getElementsByTagName("head")[0];
     var newScript = document.createElement('script');
@@ -602,6 +604,24 @@ function getPlaylist(user_id){
     el.parentNode.replaceChild(newScript,el);
 
 }
+
+//work around for IE http://lawrence.ecorp.net/inet/samples/js-getelementsbyclassname.shtml
+function cstmGetElementsByClassName(class_name) {
+    var docList = this.all || this.getElementsByTagName('*');
+    var matchArray = new Array();
+
+	/*Create a regular expression object for class*/
+    var re1 = new RegExp("(?:^|\\s)"+class_name+"(?:\\s|$)");
+    for (var i = 0; i < docList.length; i++) {
+        if (re1.test(docList[i].className) ) {
+            matchArray[matchArray.length] = docList[i];
+        }
+	}
+
+    return matchArray;
+}//eof cstmGetElementsByClassName
+
+
 
 function playlist_get_process(result){
 //somewhere in here look for these pids elsewhere and change the [+] to [on playlist]
@@ -636,12 +656,15 @@ function playlist_get_process(result){
                 var playlist1 = " <small>On playlist</small>";
 
                 //if we are displaying pids on playlist, change [+]
+                document.getElementsByClassName = cstmGetElementsByClassName;
+
                 var z = document.getElementsByClassName(pid1);
+
                 playlist_pids[pid1]=pid1;
 
                 if(z){
                    for (var i = 0; i < z.length; ++i) {
-                      var el = z.item(i); 
+                      var el = z[i]; 
                       el.innerHTML="<small>"+playlist1+"</small>";
                    }
                 }
@@ -692,7 +715,7 @@ function playlist_get_process(result){
               s="<p>Nothing on your playlist yet - you can add items using the [+] button next to the titles of programmes.</p><p>Click on the close botton on the top right, or anywhere outside this box to close it.</p>"
             }//end if suggestions
 
-  s = s+"</table";
+  s = s+"</table>";
 
   var a = document.getElementById("playlistget");
   a.innerHTML="<span class='closeButton'><a href='javascript:close_overlay(\"playlistget\")'>[X]</a></span><h3>Playlist <small style='position: absolute; right: 105px;'>"+perm+"</small></h3>\n"+s;
