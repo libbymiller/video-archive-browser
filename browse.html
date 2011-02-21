@@ -83,8 +83,8 @@ var playlist_pids={};//pids on my playlist
 var url_pid=null;
 var q=null;
 var term=null;
+var series=null;
 var pr = window.location.hash;
-//alert(pr);
 if(pr){   
   if(pr.match("pid")){
     url_pid=pr.substring(5);
@@ -95,9 +95,10 @@ if(pr){
   if(pr.match("term=")){
     term=pr.substring(6);
   }
+  if(pr.match("series=")){
+    term=pr.substring(8);
+  }
 }
-
-//hashchange stuff
 
 $(function(){
   // Bind the event.
@@ -121,7 +122,13 @@ $(function(){
      if(pr.match("term=")){
        term=pr.substring(6);
        if(term){
-         //do_cat_search(term);
+         do_cat_search(term);
+       }
+     }
+     if(pr.match("series=")){
+       series=pr.substring(8);
+       if(series){
+         do_series_search(term);
        }
      }
 
@@ -132,6 +139,7 @@ $(function(){
   // Trigger the event (useful on page load).
   $(window).hashchange();
 });
+
 
 var playlist_changed=false;
 var search_url = "http://dev.notu.be/2011/01/api/search"
@@ -165,13 +173,13 @@ function do_search(txt){
 
 function do_cat_search(txt){
 //alert(search_url+"?cat="+txt+"&fmt=json ,,,,");
-//   window.location.hash="#term="+txt;
+   window.location.hash="#term="+txt;
    insert2(search_url+"?cat="+txt+"&fmt=json&user_id="+user_id,"cat_search_script");
 }
 
 function do_series_search(txt){
 //alert(series_url+"?crid="+txt+"&fmt=json ,,,,");
-//   window.location.hash="#series="+txt;
+   window.location.hash="#series="+txt;
    insert2(series_url+"?crid="+txt+"&fmt=json&user_id="+user_id,"series_script");
 }
 
@@ -559,14 +567,18 @@ function insert() {
    }
    
 //check the hash first - shoudl override it
-   if(!url_pid){
+
+
+   if(!url_pid && !term && !series){
      url_pid=readPidCookie();
    }
+
+
    if(url_pid && url_pid!="null" && url_pid!=""){
-     window.location.hash="#pid="+url_pid;
+     window.location.href=window.location.href+"#pid="+url_pid;
      refresh_suggestions(url_pid);
    }else if(q){
-    do_search(q);
+    //do_search(q);
    }else if(term){
     //do_cat_search(term);
    }else{
