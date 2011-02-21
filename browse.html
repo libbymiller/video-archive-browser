@@ -25,52 +25,6 @@
 
 <body onload="insert()">
 
-<!-- overlays - placed them on top in an attempt to avoid this: http://flowplayer.org/tools/forum/40/53518 -->
-<div class="tandc_overlay" id="TandCs">
-  <h2>NoTube Archive Browser study consent form</h2>
-  <p>
-The BBC (NoTube research project) invites you to participate in a research study relating to a different way of 
-navigating programmes in Redux. The purpose of this study is to determine the effectiveness of this navigation 
-technique.
-  </p>
-  <p>
-Your involvement in this study will require you to browse a video collection and add programmes of interest to a 
-playlist. You'll be able to browse as often as you like over a period of 7 days. At the end of the trial, you'll 
-be able to keep the playlist and refer back to it (you'll be given a URL).
-  </p>
-  <p>
-Your playlist data will be temporarily linked to your email address. This is because we may invite you to 
-participate in a follow-up study about programme recommendations.
-  </p>
-  <p>
-At the end of the NoTube project in March 2012 we will destroy all identifying data from this experiment.
-  </p>
-  <p>
-In order to take part in the study please read the following statement and check the box if you agree to participate.
-  </p>
-  <p>
-"I freely and voluntarily agree consent to be a participant in the research on the topic of the navigation of 
-large on-demand video collections to be conducted by Libby Miller and Vicky Buser on behalf of the NoTube 
-project. Specifically, I have been asked to take part in a browsing task.
-  </p>
-  <p>
-I understand that if at any time during the task I feel unable or unwilling to continue, I am free to leave. 
-That is, my participation in this study is completely voluntary, and I may withdraw from it at any time without 
-negative consequences. In addition, should I not wish to answer any particular question or questions, I am free 
-to decline. My name will not be linked to any research materials, and I will not be identified or identifiable 
-in any report subsequently produced by the BBC or the NoTube project."
-  </p>
-  <form onsubmit="javascript:send_email();return false;">
-    <span id="err"></span>
-    <p>Your email: <input type="text" name="email" value=""/></p>
-    <p>
-    I have read and understood the above consent to participate in the study. <br />
-    My consent is not a waiver of any legal rights.
-   </p>
-   <input type="checkbox" name="agree" value=""/>
-   <input type="submit" name="go" value="I give my consent" />
-  </form>
-</div>   
 
 
 <!--scripts -->
@@ -96,7 +50,7 @@ if(pr){
     term=pr.substring(6);
   }
   if(pr.match("series=")){
-    term=pr.substring(8);
+    series=pr.substring(8);
   }
 }
 
@@ -127,7 +81,7 @@ $(function(){
      }
      if(pr.match("series=")){
        series=pr.substring(8);
-       if(series){
+       if(series && series!="null"){
          do_series_search(term);
        }
      }
@@ -178,16 +132,15 @@ function do_cat_search(txt){
 }
 
 function do_series_search(txt){
-//alert(series_url+"?crid="+txt+"&fmt=json ,,,,");
-   window.location.hash="#series="+txt;
+//alert(series_url+"?series="+txt+"&fmt=json ,,,,");
+//alert(txt);
+//?feh   window.location.hash="#series="+txt;
    insert2(series_url+"?crid="+txt+"&fmt=json&user_id="+user_id,"series_script");
 }
 
 
 
 function search_results(ob){
-//alert(ob.length)
-
   var html = "<h3>Programmes about ";
   if(ob.length==0){
     if(ob[0]["categories"]){
@@ -500,7 +453,7 @@ function process_json_results(result){
                    s = s+"<br /><small>"+text_date+"</small><br />";
                 }
 
-                s = s+"</th></tr>\n<tr><td>\n";
+                s = s+"</th></tr>\n<tr><td valign='top'>\n";
                 
                 if(img){
                    s = s+ "<div class=\"rec\"><a href=\"#pid="+pid1+"\" onclick=\"javascript:refresh_suggestions('"+pid1+"')\"><img src='"+img+"' width='150' border='0'/></a></div>";
@@ -690,20 +643,21 @@ function playlist_get_process(result){
                 s = s+"<div id=\"pl_"+pid1+"\">";
 
                 if (st1 && st1!="" && st1!=" "){
-                  s = s+"<div style=\"padding:10px\"><b><a href=\"#pid="+pid1+"\" onclick=\"javascript:refresh_suggestions('"+pid1+"')\">"+st1+": "+ct1+"</a></b>"
+                  s = s+"<div class=\"rectext\"> <b><a href=\"#pid="+pid1+"\" onclick=\"javascript:refresh_suggestions('"+pid1+"')\">"+st1+": "+ct1+"</a></b></div>"
                 }else{
-                  s = s+"<div style=\"padding:10px\"><b><a href=\"#pid="+pid1+"\" onclick=\"javascript:refresh_suggestions('"+pid1+"')\">"+ct1+"</a></b>"
+                  s = s+"<div class=\"rectext\"> <b><a href=\"#pid="+pid1+"\" onclick=\"javascript:refresh_suggestions('"+pid1+"')\">"+ct1+"</a></b></div>"
                 }
 
                 s = s+"</td></tr>\n<tr><td>";
 
+
                 if(img){
-                   s = s+ "<div style=\"float:left;padding:10px\"><img src='"+img+"' width='200'/></div>";
+                   s = s+ "<div class=\"rec\"><img src='"+img+"' width='200'/></div>";
                 }
 
                 s = s+"</td>\n<td>";
                 if(desc){
-                   s = s+"<p>"+desc;
+                   s = s+"<div class=\"recdesc\">"+desc;
                    if(text_date){
                      s = s+" From "+text_date;
                    }
@@ -715,7 +669,7 @@ function playlist_get_process(result){
                      s = s+" <a href='"+r_url+"' target='_blank'>Play</a>";
                    }
 
-                   s = s+"</p>\n"+playlist;
+                   s = s+"</p>\n"+playlist+"</div>";
                 }else{//horrible, sorry!
                   s = s+"<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>\n"+playlist;
                 }
@@ -1011,10 +965,11 @@ function result(ob){
 
   </div>
 
+  <div>
   <table>
    <tr>
-    <td valign="top" width="50%">
-        <div id="#side-a">
+    <td valign="top">
+        <div id="side-a">
           <h3 id="title" class="center">Browse Archive Video</h3>
           <div id="image" class="center"><!--main left hand large image goes here--></div>
           <p>
@@ -1042,10 +997,11 @@ Please email us if you come across any bugs or would like to ask us any question
         </div>
     </td>
     <td valign="top">
-      <span id="suggestions1"></span>
+      <div id="suggestions1"></div>
     </td>
   </tr>
 </table>
+</div>
 <br />
 <div id="footer">
 <small><span id="out"></span></small><!-- errors-->
@@ -1075,6 +1031,53 @@ function popup_starter(){
 
 </script>
 
+
+<!-- overlays - placed them on top in an attempt to avoid this: http://flowplayer.org/tools/forum/40/53518 -->
+<div class="tandc_overlay" id="TandCs">
+  <h2>NoTube Archive Browser study consent form</h2>
+  <p>
+The BBC (NoTube research project) invites you to participate in a research study relating to a different way of 
+navigating programmes in Redux. The purpose of this study is to determine the effectiveness of this navigation 
+technique.
+  </p>
+  <p>
+Your involvement in this study will require you to browse a video collection and add programmes of interest to a 
+playlist. You'll be able to browse as often as you like over a period of 7 days. At the end of the trial, you'll 
+be able to keep the playlist and refer back to it (you'll be given a URL).
+  </p>
+  <p>
+Your playlist data will be temporarily linked to your email address. This is because we may invite you to 
+participate in a follow-up study about programme recommendations.
+  </p>
+  <p>
+At the end of the NoTube project in March 2012 we will destroy all identifying data from this experiment.
+  </p>
+  <p>
+In order to take part in the study please read the following statement and check the box if you agree to participate.
+  </p>
+  <p>
+"I freely and voluntarily agree consent to be a participant in the research on the topic of the navigation of 
+large on-demand video collections to be conducted by Libby Miller and Vicky Buser on behalf of the NoTube 
+project. Specifically, I have been asked to take part in a browsing task.
+  </p>
+  <p>
+I understand that if at any time during the task I feel unable or unwilling to continue, I am free to leave. 
+That is, my participation in this study is completely voluntary, and I may withdraw from it at any time without 
+negative consequences. In addition, should I not wish to answer any particular question or questions, I am free 
+to decline. My name will not be linked to any research materials, and I will not be identified or identifiable 
+in any report subsequently produced by the BBC or the NoTube project."
+  </p>
+  <form onsubmit="javascript:send_email();return false;">
+    <span id="err"></span>
+    <p>Your email: <input type="text" name="email" value=""/></p>
+    <p>
+    I have read and understood the above consent to participate in the study. <br />
+    My consent is not a waiver of any legal rights.
+   </p>
+   <input type="checkbox" name="agree" value=""/>
+   <input type="submit" name="go" value="I give my consent" />
+  </form>
+</div>   
 
 
 <!-- overlayed element -->
