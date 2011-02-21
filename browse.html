@@ -575,7 +575,7 @@ function insert() {
 
 
    if(url_pid && url_pid!="null" && url_pid!=""){
-     window.location.href=window.location.href+"#pid="+url_pid;
+     window.location.hash="#pid="+url_pid;
      refresh_suggestions(url_pid);
    }else if(q){
     //do_search(q);
