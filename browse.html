@@ -96,13 +96,16 @@ $(function(){
 
 
 var playlist_changed=false;
-var search_url = "http://dev.notu.be/2011/01/api/search"
-var series_url = "http://dev.notu.be/2011/01/api/series"
-var suggest_url = "http://dev.notu.be/2011/01/api/suggest";
-var start_url="http://dev.notu.be/2011/01/api/random?fmt=json";
+var api_base = "http://labs.notu.be/1/development/api/";
+var search_url = api_base+"search";
+var series_url = api_base+"series";
+var suggest_url = api_base+"suggest";
+var start_url= api_base+"random?fmt=json";
 
 var checked = false;
 var user_id="unknown";
+var user_prefix='dev_user';
+
 
 function insert2(sc,id) {
 //   var headID = document.getElementsByTagName("head")[0];
@@ -839,7 +842,8 @@ function checkCookies(){
   }else{
      checked = false;
      var r=Math.floor(Math.random()*10000000);
-     user_id = 'nt_user_'+r
+     var abcd=Math.floor(Math.random()*4);
+     user_id = user_prefix+"_"+r+"_"+abcd;
   }
 }
 
@@ -960,8 +964,8 @@ function result(ob){
     <span class="playlistXML" id="playlistButtonXML"></span>
     <span class="random" id="random"><small><a href="#" onclick='javascript:do_random()'>Shuffle!</a></small></span>
     <span class="help" id="help"><a href="javascript:show_help()">Help</a></span>
-<!--    <span class="questionnaire" id="questionnaire"><a href="https://spreadsheets1.google.com/viewform?hl=en&hl=en&formkey=dDlGeWhKT1lGU0JRTGgzY1o0bEYyNFE6MQ#gid=0" target="_blank">Go to questionnaire</a></span>-->
-    <span class="about" id="about"><a href="help.html" target="_blank">About</a></span>
+    <span class="questionnaire" id="questionnaire"><a href="https://spreadsheets1.google.com/viewform?hl=en&hl=en&formkey=dDlGeWhKT1lGU0JRTGgzY1o0bEYyNFE6MQ#gid=0" target="_blank">Go to questionnaire</a></span>
+    <span class="about" id="about"><a href="about.html" target="_blank">About</a></span>
 
   </div>
 
