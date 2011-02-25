@@ -63,9 +63,7 @@ $(function(){
      if(pr.match("pid")){
        url_pid=pr.substring(5);
        if(url_pid){
-//alert(url_pid);
-alert("rs1");
-        refresh_suggestions(url_pid);
+        ///refresh_suggestions(url_pid);
        }
      }
      if(pr.match("q=")){
@@ -92,7 +90,7 @@ alert("rs1");
   });
  
   // Trigger the event (useful on page load).
-  $(window).hashchange();
+  ///$(window).hashchange();
 });
 
 
@@ -542,7 +540,7 @@ function insert() {
 
    if(url_pid && url_pid!="null" && url_pid!=""){
      window.location.hash="#pid="+url_pid;
-     //refresh_suggestions(url_pid);
+     refresh_suggestions(url_pid);
      //alert("rs2");
 
    }else if(q){
@@ -784,6 +782,8 @@ function close_overlay(id){
 //3. finds descriptions for all of them
 
 function refresh_suggestions(pid){
+//alert("rs");
+
     //close the cat search overlay if it's open
     if($("#cat_search").data("overlay")){
       $("#cat_search").data("overlay").close();
