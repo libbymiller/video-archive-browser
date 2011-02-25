@@ -941,16 +941,18 @@ function send_email(){
   var email = document.forms[0].email.value;
   var cb = document.forms[0].agree.checked;
 
-  if(email && cb && user_id){
+  if(cb && user_id){
     //var headID = document.getElementsByTagName("head")[0];
-    var newScript = document.createElement('script');
-    newScript.type = 'text/javascript';
-    newScript.src = email_url+"?email="+email+"&user_id="+user_id;
-    newScript.id = "email_script";
+    if(email){
+      var newScript = document.createElement('script');
+      newScript.type = 'text/javascript';
+      newScript.src = email_url+"?email="+email+"&user_id="+user_id;
+      newScript.id = "email_script";
 //    headID.appendChild(newScript);
 
-    var el = document.getElementById("email_script");
-    el.parentNode.replaceChild(newScript,el);
+      var el = document.getElementById("email_script");
+      el.parentNode.replaceChild(newScript,el);
+    }
 
 
 // alert("email sent!");
@@ -960,7 +962,9 @@ function send_email(){
     $("#TandCs").data("overlay").close();
   }else{
     var z = document.getElementById("err");
-    z.innerHTML="<p><font color='red'>Please add your email and check the box to continue</font></p>";
+
+    z.innerHTML="<p><font color='red'>Please check the consent box to continue.</font></p>";
+
     return false;
   }
 }
@@ -1090,14 +1094,21 @@ to decline. My name will not be linked to any research materials, and I will not
 in any report subsequently produced by the BBC or the NoTube project."
   </p>
   <form onsubmit="javascript:send_email();return false;">
-    <span id="err"></span>
-    <p>Your email: <input type="text" name="email" value=""/></p>
+
     <p>
     I have read and understood the above consent to participate in the study. <br />
     My consent is not a waiver of any legal rights.
    </p>
-   <input type="checkbox" name="agree" value=""/>
-   <input type="submit" name="go" value="I give my consent" />
+   I give my consent: <input type="checkbox" name="agree" value=""/> 
+
+    <span id="err"></span>
+    <p>
+We'd like your email address in order to contact you again about follow-up studies, but if you don't want us to, that's 
+fine. We will <a href="about.html#privacy" target="_blank">take good care of your data</a>.
+    </p>
+    <p>Your email: <input type="text" name="email" value=""/></p>
+   <p><input type="submit" name="go" value="Send data" /></p>
+
   </form>
 </div>   
 
