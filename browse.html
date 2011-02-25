@@ -102,6 +102,7 @@ var suggest_url = api_base+"suggest";
 var start_url= api_base+"random?fmt=json";
 var playlist_url=api_base+"playlist";
 var email_url=api_base+"email";
+var action_url=api_base+"action";
 
 var checked = false;
 var user_id="unknown";
@@ -283,6 +284,7 @@ function process_json_results(result){
           var catz = result["categories"];
           var series = result["series"];
 
+          var channels={"bbcone":"BBC One","bbctwo":"BBC Two","bbcthree":"BBC Three","bbcfour":"BBC Four"};
           if(catz){
              var cats ="";
              for(var i in catz){
@@ -301,9 +303,26 @@ function process_json_results(result){
           }
 
 
-          if(series && series!=""){
-              description = description+"<br /><br /><a href=\"#series="+series+"\" onclick=\"javascript:do_series_search('"+escape(series)+"');return false;\">More from this series</a><br /> ";        
+
+          if(text_date && text_date!=""){
+              description = description+" <i>From "+text_date;
+              if(channel && channel!=""){
+                description = description+", "+channels[channel];
+              }
+              description = description+"</i>";
           }
+
+          var dx = ddtt.replace(/T/,"/");
+          dx = dx.replace(/\+\d\d:\d\d/,"");
+          dx = dx.replace(/:/g,"-");
+
+          var r_url ="http://g.bbcredux.com/programme/"+channel+"/"+dx+"/"
+                
+          description =  description+"<p><a href='#' onclick='javascript:send_play_event(\""+r_url+"\",\""+pid+"\");return false;'>Play</a>   <a href='http://www.bbc.co.uk/programmes/"+pid+"' target='_blank'>More information</a>  ";
+          if(series && series!=""){
+              description = description+" <a href=\"#series="+series+"\" onclick=\"javascript:do_series_search('"+escape(series)+"');return false;\">More from this series</a> ";        
+          }
+          description =  description+"</p>";
 
           if(pid){
             if(description){
@@ -358,7 +377,7 @@ function process_json_results(result){
           try{
             doc_title.innerHTML=ti;
           }catch(e){
-            //alert(e);
+            //alert(e);//this is not allowed in safari
           }
 
           var pl = " <big><a class=\""+pid+"\" href=\"#\" title=\"Add to playlist\" onclick=\"javascript:playlist_add('"+pid+"');return false;\">[+]</a></big> ";
@@ -488,6 +507,12 @@ function process_json_results(result){
             suggest1(s);
           }
 }
+
+function send_play_event(url,pid){
+  window.open(url);
+  insert2(action_url+"?type=play&value="+pid+"&fmt=json&user_id="+user_id,"email_script");
+}
+
 
 function programme(thing){
  var desc = thing["programme"]["medium_synopsis"];
@@ -625,7 +650,7 @@ function playlist_get_process(result){
                 var text_date = suggestions[r]["text_date"];
                 var channel = suggestions[r]["channel"];
 
-                var dx = ddtt.replace("T","/");
+                var dx = ddtt.replace(/T/,"/");
                 dx = dx.replace(/\+\d\d:\d\d/,"");
                 dx = dx.replace(/:/g,"-");
 
