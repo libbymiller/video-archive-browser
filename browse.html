@@ -64,6 +64,7 @@ $(function(){
        url_pid=pr.substring(5);
        if(url_pid){
 //alert(url_pid);
+alert("rs1");
         refresh_suggestions(url_pid);
        }
      }
@@ -270,7 +271,7 @@ function recommendations(result){
 }
 
 function process_json_results(result){
-
+//alert("p j r");
           var pn = result["programme_number"];
           var ct = result["core_title"];
           var st = result["series_title"];
@@ -356,7 +357,11 @@ function process_json_results(result){
           }
 
           var doc_title = document.getElementsByTagName("title")[0];
-          doc_title.innerHTML=ti;
+          try{
+            doc_title.innerHTML=ti;
+          }catch(e){
+            //alert(e);
+          }
 
           var pl = " <big><a class=\""+pid+"\" href=\"#\" title=\"Add to playlist\" onclick=\"javascript:playlist_add('"+pid+"');return false;\">[+]</a></big> ";
           if(pid in playlist_pids){
@@ -537,7 +542,9 @@ function insert() {
 
    if(url_pid && url_pid!="null" && url_pid!=""){
      window.location.hash="#pid="+url_pid;
-     refresh_suggestions(url_pid);
+     //refresh_suggestions(url_pid);
+     //alert("rs2");
+
    }else if(q){
     //do_search(q);
    }else if(term){
@@ -548,6 +555,7 @@ function insert() {
     newScript.type = 'text/javascript';
     newScript.src = start_url+"&user_id="+user_id;
     newScript.id = "suggest_script";
+//alert("ss1");
 
   //  headID.appendChild(newScript);
     var el = document.getElementById("suggest_script");
@@ -787,6 +795,7 @@ function refresh_suggestions(pid){
     var y =suggest_url+"?pid="+pid+"&fmt=json&user_id="+user_id;
     //alert(y);
     insert_with_src(y);
+
 }
 
 function out(msg) {
