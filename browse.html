@@ -757,6 +757,26 @@ function show_help(){
 }
 
 
+function show_bug(){
+  var b = document.getElementById("bug_params");
+  if(b){
+    b.innerHTML="user_id: "+user_id+" url: "+window.location;
+  }
+  $("#bug_overlay").overlay({
+        top: 100,
+        mask: {
+                color: '#111',
+                loadSpeed: 100,
+                opacity: 0.5
+        },
+        closeOnClick: true,
+        load: false
+  });
+  $("#bug_overlay").data("overlay").load();
+
+}
+
+
 function insert_with_src(sc) {
 //   var headID = document.getElementsByTagName("head")[0];
    var newScript = document.createElement('script');
@@ -980,14 +1000,16 @@ function result(ob){
     <span class="title" id="title_header"><a href='#' onclick='javascript:do_random()'>NoTube Archive Browser</a></span>
     <span class="header_right">
       <span class="random" id="random"><small><a href="#" onclick='javascript:do_random()'>Shuffle!</a></small></span>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
       <span class="form" id="playlistButton"></span>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      <span class="questionnaire" id="questionnaire"><a href="https://spreadsheets1.google.com/viewform?hl=en&hl=en&formkey=dDlGeWhKT1lGU0JRTGgzY1o0bEYyNFE6MQ#gid=0" target="_blank">Go to questionnaire</a></span>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
+      <span class="questionnaire" id="questionnaire"><a href="https://spreadsheets1.google.com/viewform?hl=en&hl=en&formkey=dDlGeWhKT1lGU0JRTGgzY1o0bEYyNFE6MQ#gid=0" target="_blank">Questionnaire</a></span>
+&nbsp;&nbsp;&nbsp;&nbsp;
       <span class="about" id="about"><a href="about.html" target="_blank">About</a></span>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
       <span class="help" id="help"><a href="javascript:show_help()">Help</a></span>
+&nbsp;&nbsp;&nbsp;&nbsp;
+      <span class="help" id="help"><a href="javascript:show_bug()">Report bug</a></span>
     </span>
   </div>
 
@@ -1145,6 +1167,21 @@ Please spend as much or as little time as you like over the next seven days to b
 
 You can use this application as many times as you want during the course of the week. You can access the playlist you make until the end of the NoTube project (March 2012). 
 </p>
+        </div>
+</div>
+
+<div class="simple_overlay" id="bug_overlay">
+        <!-- the external content is loaded inside this tag -->
+        <div class="contentWrap">
+          <span class='closeButton'><a href='javascript:close_overlay("bug_overlay")'>[X]</a></span>
+           <p>
+            To report a bug, please email libby.miller at bbc.co.uk enclosing this information:
+           </p>
+            <pre id="bug_params"></pre> 
+           <p>
+            The more detailed information you can include about what you were doing and what the problem was, the 
+better. Feel free to include a screenshot if that illustrates the problem.
+           </p>
         </div>
 </div>
 
