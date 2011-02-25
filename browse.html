@@ -18,7 +18,7 @@
 
 <!--  <meta name="viewport" content="width=980" />-->
 
-  <title>Browse Video Archives</title>
+  <title>NoTube Archive Browser</title>
 
  </head>
 
@@ -270,6 +270,7 @@ function recommendations(result){
 }
 
 function process_json_results(result){
+
           var pn = result["programme_number"];
           var ct = result["core_title"];
           var st = result["series_title"];
@@ -354,6 +355,8 @@ function process_json_results(result){
              }
           }
 
+          var doc_title = document.getElementsByTagName("title")[0];
+          doc_title.innerHTML=ti;
 
           var pl = " <big><a class=\""+pid+"\" href=\"#\" title=\"Add to playlist\" onclick=\"javascript:playlist_add('"+pid+"');return false;\">[+]</a></big> ";
           if(pid in playlist_pids){
@@ -961,7 +964,7 @@ function result(ob){
 </script>
 
   <div id="header">
-    <span class="title">NoTube Archive Browser</span>
+    <span class="title" id="title_header"><a href='#' onclick='javascript:do_random()'>NoTube Archive Browser</a></span>
     <span class="header_right">
       <span class="random" id="random"><small><a href="#" onclick='javascript:do_random()'>Shuffle!</a></small></span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -980,7 +983,7 @@ function result(ob){
    <tr>
     <td valign="top">
         <div id="side-a">
-          <h3 id="title" class="center">Browse Archive Video</h3>
+          <h3 id="title" class="center">NoTube Archive Browser</h3>
           <div id="image" class="center"><!--main left hand large image goes here--></div>
           <p>
           <div id="telly"><!-- main left description goes here--></div>
