@@ -63,7 +63,7 @@ $(function(){
      if(pr.match("pid")){
        url_pid=pr.substring(5);
        if(url_pid){
-        ///refresh_suggestions(url_pid);
+        refresh_suggestions(url_pid);
        }
      }
      if(pr.match("q=")){
@@ -312,13 +312,13 @@ function process_json_results(result){
               description = description+"</i>";
           }
 
-          var dx = ddtt.replace(/T/,"/");
-          dx = dx.replace(/\+\d\d:\d\d/,"");
-          dx = dx.replace(/:/g,"-");
-
-          var r_url ="http://g.bbcredux.com/programme/"+channel+"/"+dx+"/"
-                
-          description =  description+"<p><a href='#' onclick='javascript:send_play_event(\""+r_url+"\",\""+pid+"\");return false;'>Play</a>   <a href='http://www.bbc.co.uk/programmes/"+pid+"' target='_blank'>More information</a>  ";
+          if(ddtt && channel){
+            var dx = ddtt.replace(/T/,"/");
+            dx = dx.replace(/\+\d\d:\d\d/,"");
+            dx = dx.replace(/:/g,"-");
+            var r_url ="http://g.bbcredux.com/programme/"+channel+"/"+dx+"/"
+            description =  description+"<p><a href='#' onclick='javascript:send_play_event(\""+r_url+"\",\""+pid+"\");return false;'>Play video</a>   <a href='http://www.bbc.co.uk/programmes/"+pid+"' target='_blank'>More information</a>  ";
+          }
           if(series && series!=""){
               description = description+" <a href=\"#series="+series+"\" onclick=\"javascript:do_series_search('"+escape(series)+"');return false;\">More from this series</a> ";        
           }
