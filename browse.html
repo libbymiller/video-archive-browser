@@ -101,6 +101,8 @@ var search_url = api_base+"search";
 var series_url = api_base+"series";
 var suggest_url = api_base+"suggest";
 var start_url= api_base+"random?fmt=json";
+var playlist_url=api_base+"playlist";
+var email_url=api_base+"email";
 
 var checked = false;
 var user_id="unknown";
@@ -203,7 +205,7 @@ function search_results(ob){
 
 
         if(pid in playlist_pids){
-          pl=" <small>On playlist</small>";
+          pl=" <small>[On playlist]</small>";
         }
 
         html = html+"<div class=\"rectext\"> \n<b><a href=\"#pid="+ob[i]["pid"]+"\" onclick=\"javascript:refresh_suggestions('"+ob[i]["pid"]+"')\">"+fulltitle+"</a></b>\n"+pl+"\n"+
@@ -355,7 +357,7 @@ function process_json_results(result){
 
           var pl = " <big><a class=\""+pid+"\" href=\"#\" title=\"Add to playlist\" onclick=\"javascript:playlist_add('"+pid+"');return false;\">[+]</a></big> ";
           if(pid in playlist_pids){
-              pl=" <small>On playlist</small>";
+              pl=" <small>[On playlist]</small>";
           }
 
           if(pid){
@@ -444,7 +446,7 @@ function process_json_results(result){
 
                 if(playlist_pids && pid1 in playlist_pids){
 //                  pl=" <small>On playlist "+pid1+"... "+keys.join(",")+"</small>";
-                  pl=" <small>On playlist</small>";
+                  pl=" <small>[On playlist]</small>";
                 }
 
                 if(pid1){
@@ -506,7 +508,7 @@ function do_random(){
 function showPlaylistButton(user_id){
 //<button type='button' onclick='javascript:show_playlist();return false;'>My Playlist</button></span>
   var d = document.getElementById("playlistButton");
-  d.innerHTML="<small><a href=\"#\" onclick=\"javascript:show_playlist('"+user_id+"');return false;\">My Playlist</a></small>";
+  d.innerHTML="<a href=\"#\" onclick=\"javascript:show_playlist('"+user_id+"');return false;\">My Playlist</a>";
 //  var dx = document.getElementById("playlistButtonXML");
 //  dx.innerHTML="<small><a href=\"http://dev.notu.be/2011/01/api/playlist?action=get&user_id="+user_id+"&fmt=xml\" target=\"_blank\">XML</a></small>";
 
@@ -560,7 +562,7 @@ function insert() {
 function getPlaylist(user_id){
     var randomnumber=Math.random()*20000;
 //    var randomnumber=Math.floor(Math.random()*20000);
-    var u ="http://dev.notu.be/2011/01/api/playlist?action=get&user_id="+user_id+"&fmt=json&r="+randomnumber;
+    var u =playlist_url+"?action=get&user_id="+user_id+"&fmt=json&r="+randomnumber;
     //var headID = document.getElementsByTagName("head")[0];
     var newScript = document.createElement('script');
     newScript.type = 'text/javascript';
@@ -592,8 +594,8 @@ function cstmGetElementsByClassName(class_name) {
 
 
 function playlist_get_process(result){
-//somewhere in here look for these pids elsewhere and change the [+] to [on playlist]
-          var perm ="<small><a href=\"http://dev.notu.be/2011/01/api/playlist?action=get&user_id="+user_id+"&fmt=html\" target=\"_blank\">Permalink</a> (opens in new window)</small>";
+//somewhere in here look for these pids elsewhere and change the [+] to [On playlist]
+          var perm ="<small><a href=\""+playlist_url+"?action=get&user_id="+user_id+"&fmt=html\" target=\"_blank\">Permalink</a> (opens in new window)</small>";
 
           playlist_pids={};
 
@@ -621,7 +623,7 @@ function playlist_get_process(result){
                 var r_url ="http://g.bbcredux.com/programme/"+channel+"/"+dx+"/";
 
                 var playlist = " <a class=\"del_"+pid1+"\" href=\"#\" onclick=\"javascript:playlist_delete('"+pid1+"');return false;\">Delete from playlist</a> ";
-                var playlist1 = " <small>On playlist</small>";
+                var playlist1 = " <small>[On playlist]</small>";
 
                 //if we are displaying pids on playlist, change [+]
                 document.getElementsByClassName = cstmGetElementsByClassName;
@@ -681,7 +683,7 @@ function playlist_get_process(result){
 
               }//end for
             }else{
-              s="<p>Nothing on your playlist yet - you can add items using the [+] button next to the titles of programmes.</p><p>Click on the close botton on the top right, or anywhere outside this box to close it.</p>"
+              s="<p>Nothing on your playlist yet - you can add items using the [+] button next to the titles of programmes.</p>"
             }//end if suggestions
 
   s = s+"</table>";
@@ -888,7 +890,7 @@ function eraseCookie(name) {
 function playlist_add(pid){
 //   playlist_changed=true;
 
-   var u = "http://dev.notu.be/2011/01/api/playlist?action=add&user_id="+user_id+"&pid="+pid+"&fmt=json";
+   var u = playlist_url+"?action=add&user_id="+user_id+"&pid="+pid+"&fmt=json";
 
 //   var headID = document.getElementsByTagName("head")[0];
    var newScript = document.createElement('script');
@@ -906,7 +908,7 @@ function playlist_delete(pid){
 //alert("http://dev.notu.be/2011/01/api/playlist?action=delete&user_id="+user_id+"&pid="+pid+"&fmt=json");
    document.getElementById("pl_"+pid).style.display = 'none';
 
-   var u = "http://dev.notu.be/2011/01/api/playlist?action=delete&user_id="+user_id+"&pid="+pid+"&fmt=json";
+   var u = playlist_url+"?action=delete&user_id="+user_id+"&pid="+pid+"&fmt=json";
  //  var headID = document.getElementsByTagName("head")[0];
    var newScript = document.createElement('script');
    newScript.type = 'text/javascript';
@@ -931,7 +933,7 @@ function send_email(){
     //var headID = document.getElementsByTagName("head")[0];
     var newScript = document.createElement('script');
     newScript.type = 'text/javascript';
-    newScript.src = "http://dev.notu.be/2011/01/api/email?email="+email+"&user_id="+user_id;
+    newScript.src = email_url+"?email="+email+"&user_id="+user_id;
     newScript.id = "email_script";
 //    headID.appendChild(newScript);
 
@@ -960,13 +962,17 @@ function result(ob){
 
   <div id="header">
     <span class="title">NoTube Archive Browser</span>
-    <span class="form" id="playlistButton"></span>
-    <span class="playlistXML" id="playlistButtonXML"></span>
-    <span class="random" id="random"><small><a href="#" onclick='javascript:do_random()'>Shuffle!</a></small></span>
-    <span class="help" id="help"><a href="javascript:show_help()">Help</a></span>
-    <span class="questionnaire" id="questionnaire"><a href="https://spreadsheets1.google.com/viewform?hl=en&hl=en&formkey=dDlGeWhKT1lGU0JRTGgzY1o0bEYyNFE6MQ#gid=0" target="_blank">Go to questionnaire</a></span>
-    <span class="about" id="about"><a href="about.html" target="_blank">About</a></span>
-
+    <span class="header_right">
+      <span class="random" id="random"><small><a href="#" onclick='javascript:do_random()'>Shuffle!</a></small></span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <span class="form" id="playlistButton"></span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <span class="questionnaire" id="questionnaire"><a href="https://spreadsheets1.google.com/viewform?hl=en&hl=en&formkey=dDlGeWhKT1lGU0JRTGgzY1o0bEYyNFE6MQ#gid=0" target="_blank">Go to questionnaire</a></span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <span class="about" id="about"><a href="about.html" target="_blank">About</a></span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <span class="help" id="help"><a href="javascript:show_help()">Help</a></span>
+    </span>
   </div>
 
   <div>
